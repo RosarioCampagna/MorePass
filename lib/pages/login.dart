@@ -189,7 +189,9 @@ class _LoginPageState extends State<LoginPage> {
                     thickness: 1,
                   ),
                 ),
+                const SizedBox(height: 20),
 
+                //tasto per accedere a google
                 CustomButton(
                     onPressed: () async => await Supabase.instance.client.auth
                         .signInWithOAuth(OAuthProvider.google),
