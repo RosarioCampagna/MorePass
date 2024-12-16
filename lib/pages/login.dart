@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/apis/apis.dart';
 import 'package:myapp/components/colors.dart';
@@ -183,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
 
                 SizedBox(
-                  width: 900,
+                  width: 980,
                   child: Divider(
                     color: darkMode ? secondaryLight : secondaryDark,
                     thickness: 1,
@@ -193,8 +196,18 @@ class _LoginPageState extends State<LoginPage> {
 
                 //tasto per accedere a google
                 CustomButton(
-                    onPressed: () async => await Supabase.instance.client.auth
-                        .signInWithOAuth(OAuthProvider.google),
+                    onPressed: () async {
+                      if (!kIsWeb && Platform.isAndroid) {
+                        await SupaBase().signInWithGoogle();
+                        return;
+                      }
+
+                      await Supabase.instance.client.auth.signInWithOAuth(
+                          OAuthProvider.google,
+                          authScreenLaunchMode: kIsWeb
+                              ? LaunchMode.platformDefault
+                              : LaunchMode.externalApplication);
+                    },
                     text: 'Accedi con Google',
                     backgroundButtonColor: Colors.red.shade400)
               ],
