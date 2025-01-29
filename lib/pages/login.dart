@@ -2,10 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/apis/apis.dart';
-import 'package:myapp/components/colors.dart';
-import 'package:myapp/components/custom_button.dart';
-import 'package:myapp/components/textfield.dart';
+import 'package:morepass/apis/apis.dart';
+import 'package:morepass/components/colors.dart';
+import 'package:morepass/components/custom_components/custom_button.dart';
+import 'package:morepass/components/custom_components/textfield.dart';
+import 'package:morepass/components/route_builder.dart';
+import 'package:morepass/pages/email_confirmation.dart';
+import 'package:morepass/pages/recovery_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -33,184 +36,237 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: darkMode ? secondaryDark : secondaryLight,
+      backgroundColor: receiveDarkMode(false),
       appBar: AppBar(
-        backgroundColor: darkMode ? secondaryDark : secondaryLight,
+        backgroundColor: receiveDarkMode(false),
         title: Text(
           "Effettua il login",
-          style: TextStyle(color: !darkMode ? secondaryDark : secondaryLight),
+          style: TextStyle(color: receiveDarkMode(true)),
         ),
         centerTitle: true,
       ),
       body: Form(
           key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                //textfield per l'email
-                CustomTextField(
-                    controller: _emailController,
-                    leadingIcon: Icons.email_rounded,
-                    hint: 'Inserisci email',
-                    error: "Inserisci un'email valida"),
+          child: SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //textfield per l'email
+                  SizedBox(
+                    width: 1000,
+                    child: CustomTextField(
+                        controller: _emailController,
+                        leadingIcon: Icons.email_rounded,
+                        hint: 'Inserisci email',
+                        error: "Inserisci un'email valida",
+                        filled: false),
+                  ),
 
-                //textfield per la password
-                CustomTextField(
-                    controller: _passwordController,
-                    leadingIcon: Icons.key_rounded,
-                    visible: true,
-                    hint: 'Inserisci password',
-                    error: "Inserisci una password valida"),
+                  //textfield per la password
+                  SizedBox(
+                    width: 1000,
+                    child: CustomTextField(
+                        controller: _passwordController,
+                        leadingIcon: Icons.key_rounded,
+                        visible: true,
+                        hint: 'Inserisci password',
+                        error: "Inserisci una password valida",
+                        filled: false),
+                  ),
 
-                //tasto per la creazione dell'account
-                CustomButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        try {
-                          //effettua il login con email e password
-                          await SupaBase().signInWithEmailPassword(
-                              _passwordController.text, _emailController.text);
+                  //tasto per la creazione dell'account
+                  SizedBox(
+                    width: 1000,
+                    child: CustomButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            try {
+                              //effettua il login con email e password
+                              await SupaBase().signInWithEmailPassword(
+                                  _passwordController.text,
+                                  _emailController.text);
 
-                          //setta il tema
-                          await setColor();
-                          await setDarkMode();
-                        } catch (e) {
-                          //in caso di errore mostra il messaggio
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                behavior: SnackBarBehavior.floating,
-                                content: Text(e.toString())));
+                              //setta il tema
+                              await setColor();
+                              await setDarkMode();
+                            } catch (e) {
+                              if (e
+                                  .toString()
+                                  .contains('email_not_confirmed')) {
+                                SupaBase().sendEmailConfirmation(
+                                    _emailController.text);
+                                slideUpperNavigatorDialog(
+                                    EmailConfirmation(), context);
+                              }
+
+                              //in caso di errore mostra il messaggio
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12)),
+                                        behavior: SnackBarBehavior.floating,
+                                        content: Text(e.toString())));
+                              }
+                            }
                           }
-                        }
-                      }
-                    },
-                    text: 'Accedi'),
+                        },
+                        child: Text('Accedi',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600))),
+                  ),
 
-                const SizedBox(height: 20),
+                  const SizedBox(height: 20),
 
-                //tasto per recuperare la password
-                TextButton(
-                    onPressed: () => showDialog(
-                        context: context,
-                        builder: (context) {
-                          final TextEditingController emailController =
-                              TextEditingController();
+                  //tasto per recuperare la password
+                  TextButton(
+                      onPressed: () => showDialog(
+                          context: context,
+                          builder: (context) {
+                            final TextEditingController emailController =
+                                TextEditingController();
 
-                          final GlobalKey<FormState> formKey =
-                              GlobalKey<FormState>();
+                            final GlobalKey<FormState> formKey =
+                                GlobalKey<FormState>();
 
-                          return AlertDialog(
-                            content: Form(
-                                key: formKey,
-                                child: SizedBox(
-                                  width: 500,
-                                  child: CustomTextField(
-                                      controller: emailController,
-                                      leadingIcon: Icons.email_rounded,
-                                      hint: "Inserisci l'email da recuperare",
-                                      error: 'Inserisci la tua email'),
-                                )),
-                            actions: [
-                              //tasto per annullare
-                              TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Annulla')),
+                            return AlertDialog(
+                              backgroundColor: receiveDarkMode(false),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
+                              content: Form(
+                                  key: formKey,
+                                  child: SizedBox(
+                                    width: 500,
+                                    child: CustomTextField(
+                                        controller: emailController,
+                                        leadingIcon: Icons.email_rounded,
+                                        hint: "Inserisci l'email da recuperare",
+                                        error: 'Inserisci la tua email',
+                                        filled: false),
+                                  )),
+                              actions: [
+                                //tasto per annullare
+                                TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text(
+                                      'Annulla',
+                                      style: TextStyle(
+                                          color: receiveDarkMode(true)),
+                                    )),
 
-                              //tasto per inviare l'email di recupero
-                              TextButton(
-                                  onPressed: () {
-                                    if (_formKey.currentState!.validate()) {
-                                      //prova ad inviare l'email di recupero
-                                      try {
-                                        SupaBase().resetPassword(
-                                            _emailController.text);
-                                      } catch (e) {
-                                        //in caso di errore
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12)),
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                  content: Text(e.toString())));
-                                        }
-                                      } finally {
-                                        //se l'invio riesce
-                                        if (mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                                  shape: RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12)),
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                  content: const Text(
-                                                      'Controlla la tua casella di posta elettronica')));
+                                //tasto per inviare l'email di recupero
+                                TextButton(
+                                    onPressed: () {
+                                      if (formKey.currentState!.validate()) {
+                                        //prova ad inviare l'email di recupero
+                                        try {
+                                          SupaBase().resetPassword(
+                                              emailController.text);
+                                        } catch (e) {
+                                          //in caso di errore
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12)),
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    content:
+                                                        Text(e.toString())));
+                                          }
+                                        } finally {
+                                          //se l'invio riesce
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12)),
+                                                    behavior: SnackBarBehavior
+                                                        .floating,
+                                                    content: const Text(
+                                                        'Controlla la tua casella di posta elettronica, se l\'email non è presente controlla lo spam')));
+                                            Navigator.pop(context);
+
+                                            slideUpperNavigatorDialog(
+                                                RecoveryPage(), context);
+                                          }
                                         }
                                       }
-                                    }
-                                  },
-                                  child: const Text('Invia'))
-                            ],
-                          );
-                        }),
-                    child: Text(
-                      'Hai dimenticato la password?',
-                      style: TextStyle(
-                          color: primary, fontWeight: FontWeight.w600),
-                    )),
-
-                //tasto per passare alla registrazione
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Hai bisogno di un account?',
+                                    },
+                                    child: Text('Invia',
+                                        style: TextStyle(color: primary)))
+                              ],
+                            );
+                          }),
+                      child: Text(
+                        'Hai dimenticato la password?',
                         style: TextStyle(
-                            color: darkMode ? secondaryLight : secondaryDark)),
-                    TextButton(
-                        onPressed: widget.onTap,
-                        child: Text(
-                          'Registrati',
-                          style: TextStyle(
-                              color: primary, fontWeight: FontWeight.w600),
-                        ))
-                  ],
-                ),
+                            color: primary, fontWeight: FontWeight.w600),
+                      )),
 
-                SizedBox(
-                  width: 980,
-                  child: Divider(
-                    color: darkMode ? secondaryLight : secondaryDark,
-                    thickness: 1,
+                  //tasto per passare alla registrazione
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Hai bisogno di un account?',
+                          style: TextStyle(color: receiveDarkMode(true))),
+                      TextButton(
+                          onPressed: widget.onTap,
+                          child: Text(
+                            'Registrati',
+                            style: TextStyle(
+                                color: primary, fontWeight: FontWeight.w600),
+                          ))
+                    ],
                   ),
-                ),
-                const SizedBox(height: 20),
 
-                //tasto per accedere a google
-                CustomButton(
-                    onPressed: () async {
-                      if (!kIsWeb && Platform.isAndroid) {
-                        await SupaBase().signInWithGoogle();
-                        return;
-                      }
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    width: 1000,
+                    child: Divider(
+                      color: receiveDarkMode(true),
+                      thickness: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
 
-                      await Supabase.instance.client.auth.signInWithOAuth(
-                          OAuthProvider.google,
-                          authScreenLaunchMode: kIsWeb
-                              ? LaunchMode.platformDefault
-                              : LaunchMode.externalApplication);
-                    },
-                    text: 'Accedi con Google',
-                    backgroundButtonColor: Colors.red.shade400)
-              ],
+                  if (defaultTargetPlatform != TargetPlatform.iOS ||
+                      defaultTargetPlatform != TargetPlatform.windows)
+                    //tasto per accedere a google
+                    SizedBox(
+                      width: 1000,
+                      child: CustomButton(
+                          onPressed: () async {
+                            if (!kIsWeb && Platform.isAndroid) {
+                              await SupaBase().signInWithGoogle();
+                              return;
+                            }
+
+                            await Supabase.instance.client.auth.signInWithOAuth(
+                                OAuthProvider.google,
+                                authScreenLaunchMode: kIsWeb
+                                    ? LaunchMode.platformDefault
+                                    : LaunchMode.externalApplication);
+                          },
+                          backgroundButtonColor: Colors.red.shade400,
+                          child: Text('Accedi con Google',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600))),
+                    )
+                ],
+              ),
             ),
           )),
     );

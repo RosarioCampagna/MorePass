@@ -1,6 +1,6 @@
 {
-    "name": "myapp",
-    "short_name": "myapp",
+    "name": "Web password manager",
+    "short_name": "Web password manager",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

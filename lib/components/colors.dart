@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/apis/apis.dart';
+import 'package:morepass/apis/apis.dart';
 
 Color orange = const Color.fromARGB(255, 197, 124, 40);
 Color red = const Color.fromARGB(255, 197, 40, 40);
@@ -35,9 +35,19 @@ Future<void> setDarkMode() async {
 }
 
 Color secondaryDark = Colors.grey.shade900;
-Color secondaryLight = Colors.grey.shade200;
+Color secondaryLight = Colors.grey.shade100;
 
 ThemeData theme = ThemeData(
-    scaffoldBackgroundColor: darkMode ? secondaryDark : secondaryLight,
+    scaffoldBackgroundColor: receiveDarkMode(false),
     primaryColor: primary,
     useMaterial3: true);
+
+Color receiveDarkMode(bool reverted) {
+  return darkMode
+      ? reverted
+          ? secondaryLight
+          : secondaryDark
+      : reverted
+          ? secondaryDark
+          : secondaryLight;
+}

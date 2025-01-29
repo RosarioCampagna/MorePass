@@ -1,9 +1,17 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:myapp/apis/apis.dart';
-import 'package:myapp/components/colors.dart';
-import 'package:myapp/components/custom_button.dart';
-import 'package:myapp/components/textfield.dart';
-import 'package:myapp/pages/password_list.dart';
+import 'package:morepass/apis/apis.dart';
+import 'package:morepass/apis/password_generator.dart';
+import 'package:morepass/components/colors.dart';
+import 'package:morepass/components/custom_components/custom_button.dart';
+import 'package:morepass/components/custom_components/textfield.dart';
+import 'package:morepass/components/route_builder.dart';
+import 'package:morepass/pages/email_confirmation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../components/custom_components/psw_manager_strenght.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key, required this.onTap});
@@ -23,6 +31,9 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  bool visibleFirst = false;
+  bool visibleSecond = false;
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -35,12 +46,12 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: darkMode ? secondaryDark : secondaryLight,
+      backgroundColor: receiveDarkMode(false),
       appBar: AppBar(
-        backgroundColor: darkMode ? secondaryDark : secondaryLight,
+        backgroundColor: receiveDarkMode(false),
         title: Text(
           "Registrati",
-          style: TextStyle(color: !darkMode ? secondaryDark : secondaryLight),
+          style: TextStyle(color: receiveDarkMode(true)),
         ),
         centerTitle: true,
       ),
@@ -52,110 +63,194 @@ class _RegisterPageState extends State<RegisterPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 //textfield per l'email
-                CustomTextField(
-                    controller: _emailController,
-                    leadingIcon: Icons.email_rounded,
-                    hint: 'Inserisci email',
-                    error: "Inserisci un'email valida"),
+                SizedBox(
+                  width: 1000,
+                  child: CustomTextField(
+                      controller: _emailController,
+                      leadingIcon: Icons.email_rounded,
+                      hint: 'Inserisci email',
+                      error: "Inserisci un'email valida",
+                      filled: false),
+                ),
 
                 //textfield dell'username
-                CustomTextField(
-                    controller: _usernameController,
-                    leadingIcon: Icons.person_rounded,
-                    hint: 'Inserisci un nome utente',
-                    error: 'Inserisci un nome utente valido'),
+                SizedBox(
+                  width: 1000,
+                  child: CustomTextField(
+                      controller: _usernameController,
+                      leadingIcon: Icons.person_rounded,
+                      hint: 'Inserisci un nome utente',
+                      error: 'Inserisci un nome utente valido',
+                      filled: false),
+                ),
 
                 //textfield per la password
-                CustomTextField(
-                    controller: _passwordController,
-                    leadingIcon: Icons.key_rounded,
-                    visible: true,
-                    hint: 'Inserisci password',
-                    error: "Inserisci una password valida"),
+                SizedBox(
+                  width: 1000,
+                  child: CustomTextField(
+                      controller: _passwordController,
+                      leadingIcon: Icons.key_rounded,
+                      visible: true,
+                      hint: 'Inserisci password',
+                      error: "Inserisci una password valida",
+                      onChanged: () => setState(() {}),
+                      filled: false),
+                ),
 
                 //textfield per la conferma della password
-                CustomTextField(
-                    controller: _passwordConfirmController,
-                    leadingIcon: Icons.key_rounded,
-                    visible: true,
-                    hint: 'Inserisci password',
-                    error: "Inserisci una password valida"),
+                SizedBox(
+                  width: 1000,
+                  child: CustomTextField(
+                      controller: _passwordConfirmController,
+                      leadingIcon: Icons.key_rounded,
+                      visible: true,
+                      onChanged: () => setState(() {}),
+                      hint: 'Inserisci password',
+                      error: "Inserisci una password valida",
+                      filled: false),
+                ),
+
+                if (_passwordController.text.isNotEmpty)
+                  //testo per la forza della password
+                  Container(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    width: 1000,
+                    child: Column(
+                      children: [
+                        PswManagerStrenght(
+                            icon: Icons.abc_rounded,
+                            contained: _passwordController.text
+                                    .includesLower() ||
+                                _passwordConfirmController.text.includesLower(),
+                            text: 'Lettere minuscole'),
+                        PswManagerStrenght(
+                            icon: Icons.abc_rounded,
+                            contained: _passwordController.text
+                                    .includesUpper() ||
+                                _passwordConfirmController.text.includesLower(),
+                            text: 'Lettere maiuscole'),
+                        PswManagerStrenght(
+                            icon: Icons.numbers_rounded,
+                            contained: _passwordController.text.includesNum() ||
+                                _passwordConfirmController.text.includesLower(),
+                            text: 'Numeri'),
+                        PswManagerStrenght(
+                            contained: _passwordController.text.includesSym() ||
+                                _passwordConfirmController.text.includesLower(),
+                            text: 'Simboli',
+                            icon: Icons.emoji_symbols_rounded),
+                        PswManagerStrenght(
+                            contained: _passwordController.text ==
+                                _passwordConfirmController.text,
+                            text: _passwordController.text ==
+                                    _passwordConfirmController.text
+                                ? 'Le password coincidono'
+                                : 'Le password non coincidono',
+                            icon: _passwordController.text ==
+                                    _passwordConfirmController.text
+                                ? Icons.check_rounded
+                                : Icons.close_rounded)
+                      ],
+                    ),
+                  ),
 
                 //tasto per la creazione dell'account
-                CustomButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        if (_passwordController.text ==
-                            _passwordConfirmController.text) {
-                          //crea l'utente
-                          try {
-                            await SupaBase().signUpNewUser(
-                                _passwordController.text,
-                                _emailController.text,
-                                _usernameController.text);
+                Container(
+                  padding: const EdgeInsets.only(bottom: 5),
+                  width: 1000,
+                  child: CustomButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          if (_passwordController.text ==
+                                  _passwordConfirmController.text &&
+                              _passwordController.text.meetsPasswordRequirement(
+                                  true, true, true, true)) {
+                            //crea l'utente
+                            try {
+                              await SupaBase().signUpNewUser(
+                                  _passwordController.text,
+                                  _emailController.text,
+                                  _usernameController.text);
+                            } catch (e) {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12)),
+                                        behavior: SnackBarBehavior.floating,
+                                        content: Text(e.toString())));
+                              }
+                            } finally {
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    behavior: SnackBarBehavior.floating,
+                                    content: const Text(
+                                        'Controlla la tua casella di posta elettronica per verificare il tuo account')));
+                              }
 
-                            //crea il valore nella tabella con le preferenze di default
-                            await SupaBase().registerUserPreferencies();
-                          } catch (e) {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12)),
-                                      behavior: SnackBarBehavior.floating,
-                                      content: Text(e.toString())));
-                            }
-                          } finally {
-                            if (mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
-                                  behavior: SnackBarBehavior.floating,
-                                  content: const Text(
-                                      'Controlla la tua casella di posta elettronica per verificare il tuo account')));
-
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const PasswordList()));
+                              slideUpperNavigatorDialog(
+                                  EmailConfirmation(), context);
                             }
                           }
-                        } else {
-                          showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                    content: const Text(
-                                        'Le password devono coincidere'),
-                                    actionsAlignment: MainAxisAlignment.center,
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () => Navigator.pop,
-                                          child: const Text('Okay'))
-                                    ],
-                                  ));
                         }
-                      }
-                    },
-                    text: 'Crea utente'),
+                      },
+                      child: Text('Crea utente')),
+                ),
 
                 //tasto per tornare alla schermata di login
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text('Hai già un account?',
-                        style: TextStyle(
-                            color: darkMode ? secondaryLight : secondaryDark)),
+                        style: TextStyle(color: receiveDarkMode(true))),
                     TextButton(
                         onPressed: widget.onTap,
                         child: Text(
                           'Accedi',
                           style: TextStyle(
                               color: primary, fontWeight: FontWeight.w600),
-                        ))
+                        )),
                   ],
                 ),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  width: 1000,
+                  child: Divider(
+                    color: receiveDarkMode(true),
+                    thickness: 1,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                //se non si è su iOS
+                if (defaultTargetPlatform != TargetPlatform.iOS)
+                  //tasto per accedere a google
+                  SizedBox(
+                    width: 1000,
+                    child: CustomButton(
+                        onPressed: () async {
+                          if (!kIsWeb && Platform.isAndroid) {
+                            await SupaBase().signInWithGoogle();
+                            return;
+                          }
+
+                          await Supabase.instance.client.auth.signInWithOAuth(
+                              OAuthProvider.google,
+                              authScreenLaunchMode: kIsWeb
+                                  ? LaunchMode.platformDefault
+                                  : LaunchMode.externalApplication);
+                        },
+                        backgroundButtonColor: Colors.red.shade400,
+                        child: Text('Registrati con Google',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w600))),
+                  )
               ],
             ),
           )),

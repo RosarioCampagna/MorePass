@@ -1,16 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:myapp/apis/apis.dart';
-import 'package:myapp/apis/password.dart';
-import 'package:myapp/components/auth_gate.dart';
-import 'package:myapp/components/bicolor.dart';
-import 'package:myapp/components/custom_button.dart';
-import 'package:myapp/components/custom_list_tile.dart';
-import 'package:myapp/components/settings_tile.dart';
-import 'package:myapp/components/textfield.dart';
+import 'package:morepass/apis/apis.dart';
+import 'package:morepass/apis/password.dart';
+import 'package:morepass/components/page_setter/auth_gate.dart';
+import 'package:morepass/components/custom_components/bicolor.dart';
+import 'package:morepass/components/custom_components/custom_button.dart';
+import 'package:morepass/components/custom_components/custom_list_tile.dart';
+import 'package:morepass/components/custom_components/settings_tile.dart';
+import 'package:morepass/components/custom_components/textfield.dart';
 
 import '../components/colors.dart';
+import '../components/route_builder.dart';
 
 class ColorThemeChoosePage extends StatefulWidget {
   const ColorThemeChoosePage({super.key});
@@ -56,7 +57,7 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
                   color: darkMode ? secondaryLight : secondaryDark)),
           title: Text(
             'Scegli il tuo tema',
-            style: TextStyle(color: !darkMode ? secondaryDark : secondaryLight),
+            style: TextStyle(color: darkMode ? secondaryLight : secondaryDark),
           ),
           centerTitle: true),
       body: Padding(
@@ -67,17 +68,26 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               //textfield
-              CustomTextField(
-                  controller: TextEditingController(),
-                  leadingIcon: Icons.person_rounded,
-                  hint: 'Questo è un inserimento di testo con questo tema',
-                  error: 'Questo è un errore di testo con questo tema'),
+              SizedBox(
+                width: 1000,
+                child: CustomTextField(
+                    controller: TextEditingController(),
+                    leadingIcon: Icons.person_rounded,
+                    hint: 'Questo è un inserimento di testo con questo tema',
+                    error: 'Questo è un errore di testo con questo tema',
+                    filled: false),
+              ),
 
               const SizedBox(height: 20),
 
               //tasto
-              CustomButton(
-                  onPressed: () {}, text: 'Questo è un tasto con questo tema'),
+              SizedBox(
+                width: 1000,
+                child: CustomButton(
+                    onPressed: () {},
+                    child: Text('Questo è un tasto con questo tema',
+                        style: const TextStyle(fontWeight: FontWeight.w600))),
+              ),
 
               const SizedBox(height: 20),
 
@@ -89,6 +99,7 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
                         provider: 'Questa è una voce in una lista ',
                         username: 'username',
                         password: 'password',
+                        category: '',
                         notes: 'con questo tema'),
                     onPressed: () {},
                     onTilePress: () {}),
@@ -98,10 +109,13 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
 
               //settings tile
               // ignore: prefer_const_constructors
-              SettingsTile(
-                  title: 'Questo è un tile delle impostazioni',
-                  subtitle: 'con questo tema',
-                  icon: Icons.settings_rounded),
+              SizedBox(
+                width: 1000,
+                child: SettingsTile(
+                    title: 'Questo è un tile delle impostazioni',
+                    subtitle: 'con questo tema',
+                    icon: Icons.settings_rounded),
+              ),
 
               const SizedBox(height: 20),
 
@@ -166,6 +180,8 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
                   ],
                 ),
               ),
+
+              const SizedBox(height: 10),
 
               //tema chiaro
               SizedBox(
@@ -232,64 +248,73 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
               const SizedBox(height: 20),
 
               //tasto che conferma il cambiamento del colore
-              CustomButton(
-                  onPressed: () async {
-                    //aggiorna il tema
-                    await SupaBase().updateTheme(color, darkMode);
+              SizedBox(
+                width: 1000,
+                child: CustomButton(
+                    onPressed: () async {
+                      //aggiorna il tema
+                      await SupaBase().updateTheme(color, darkMode);
 
-                    //aggiorna il tema
-                    await setColor();
-                    await setDarkMode();
+                      //aggiorna il tema
+                      await setColor();
+                      await setDarkMode();
 
-                    //mostra un dialog con le informazioni necessarie
-                    showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CircularProgressIndicator(color: primary),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                      'Per rendere effettivo il cambiamento rieffettua il login')
-                                ],
-                              ),
-                            ));
-
-                    //fa sparire il caricamento dopo un tot di secondi
-                    Future.delayed(const Duration(seconds: 3))
-                        .then((onValue) async {
-                      Navigator.pop(context);
-
-                      //mostra un messaggio che dice che il tema è aggiornato
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          content: Text('Tema aggiornato con successo')));
-
-                      //controlla che non sia la prima volta che si effettua il login
-                      if ((await SupaBase().getFirstTime()).first['first'] ==
-                          true) {
-                        SupaBase().updateFirstTime();
-                      }
-
-                      //se la route non è /authGate allora ritorna a questa pagina
                       if (ModalRoute.of(context)!.settings.name ==
                           '/themeChoosing') {
-                        //effettua il logout
-                        SupaBase().signOut();
-
-                        //riporta alla pagina di login
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AUthGate()),
-                            (_) => false);
+                        //mostra un dialog con le informazioni necessarie
+                        showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  backgroundColor: receiveDarkMode(false),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CircularProgressIndicator(color: primary),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                          'Per rendere effettivo il cambiamento rieffettua il login',
+                                          style: TextStyle(
+                                              color: receiveDarkMode(true)))
+                                    ],
+                                  ),
+                                ));
                       }
-                    });
-                  },
-                  text: 'Conferma')
+
+                      //fa sparire il caricamento dopo un tot di secondi
+                      Future.delayed(const Duration(seconds: 3))
+                          .then((onValue) async {
+                        Navigator.pop(context);
+
+                        //mostra un messaggio che dice che il tema è aggiornato
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            content: Text('Tema aggiornato con successo')));
+
+                        //controlla che non sia la prima volta che si effettua il login
+                        if ((await SupaBase().getFirstTime()).first['first'] ==
+                            true) {
+                          SupaBase().updateFirstTime();
+                        }
+
+                        //se la route non è /authGate allora ritorna a questa pagina
+                        if (ModalRoute.of(context)!.settings.name ==
+                            '/themeChoosing') {
+                          //effettua il logout
+                          SupaBase().signOut();
+
+                          //riporta alla pagina di login
+                          Navigator.pushAndRemoveUntil(context,
+                              slideLeftNavigator(AUthGate()), (_) => false);
+                        }
+                      });
+                    },
+                    child: Text('Conferma',
+                        style: const TextStyle(fontWeight: FontWeight.w600))),
+              )
             ],
           ),
         ),

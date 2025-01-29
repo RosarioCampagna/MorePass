@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/pages/login.dart';
+import 'package:morepass/pages/login.dart';
 
 import '../pages/register.dart';
 
