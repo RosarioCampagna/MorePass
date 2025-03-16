@@ -20,8 +20,8 @@ class CustomRadioButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       hoverDuration: const Duration(milliseconds: 200),
       hoverColor: darkMode
-          ? secondaryLight.withOpacity(0.05)
-          : secondaryDark.withOpacity(0.05),
+          ? secondaryLight.withAlpha(13)
+          : secondaryDark.withAlpha(13),
       onTap: () => onChanged!(value),
       child: Row(
         children: [

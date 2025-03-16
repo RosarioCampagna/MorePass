@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:morepass/components/colors.dart';
 
 class CustomCheckbox extends StatelessWidget {
-  const CustomCheckbox(
-      {super.key, required this.child, required this.selected, this.onChanged});
+  const CustomCheckbox({super.key, required this.child, required this.selected, this.onChanged});
 
   final Widget child;
   final bool selected;
@@ -14,9 +13,7 @@ class CustomCheckbox extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       hoverDuration: const Duration(milliseconds: 200),
-      hoverColor: darkMode
-          ? secondaryDark.withOpacity(1)
-          : secondaryLight.withOpacity(1),
+      hoverColor: darkMode ? secondaryDark.withAlpha(255) : secondaryLight.withAlpha(255),
       onTap: () => onChanged!(!selected),
       child: Row(
         children: [
@@ -25,8 +22,7 @@ class CustomCheckbox extends StatelessWidget {
           Checkbox(
             value: selected,
             onChanged: onChanged,
-            fillColor:
-                WidgetStatePropertyAll(selected ? primary : Colors.transparent),
+            fillColor: WidgetStatePropertyAll(selected ? primary : Colors.transparent),
           )
         ],
       ),
