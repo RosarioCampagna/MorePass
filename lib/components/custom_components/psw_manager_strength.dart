@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
-class PswManagerStrenght extends StatelessWidget {
-  const PswManagerStrenght(
-      {super.key,
-      required this.contained,
-      required this.text,
-      required this.icon});
+class PswManagerStrength extends StatelessWidget {
+  const PswManagerStrength({super.key, required this.contained, required this.text, required this.icon});
 
   final bool contained;
   final String text;
@@ -26,9 +22,7 @@ class PswManagerStrenght extends StatelessWidget {
         Text(
           text,
           style: TextStyle(
-              color: contained ? Colors.green : Colors.grey.shade600,
-              fontSize: 14,
-              fontWeight: FontWeight.w400),
+              color: contained ? Colors.green : Colors.grey.shade600, fontSize: 14, fontWeight: FontWeight.w400),
         )
       ],
     );

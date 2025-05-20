@@ -153,7 +153,7 @@ class _PasswordListMobileState extends State<PasswordListMobile> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Column(children: [
-                  //textfield per cercare le pasword
+                  //textfield per cercare le password
                   CustomTextField(
                     controller: _searchBar,
                     leadingIcon: Icons.search_rounded,
@@ -168,7 +168,7 @@ class _PasswordListMobileState extends State<PasswordListMobile> {
                   //tasto per ordinare la lista delle password
                   InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    hoverColor: receiveDarkMode(true).withOpacity(0.05),
+                    hoverColor: receiveDarkMode(true).withAlpha(13),
                     hoverDuration: const Duration(milliseconds: 200),
                     onTap: () {
                       showDialog(

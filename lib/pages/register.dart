@@ -11,7 +11,7 @@ import 'package:morepass/components/route_builder.dart';
 import 'package:morepass/pages/email_confirmation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../components/custom_components/psw_manager_strenght.dart';
+import '../components/custom_components/psw_manager_strength.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key, required this.onTap});
@@ -26,8 +26,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfirmController =
-      TextEditingController();
+  final TextEditingController _passwordConfirmController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -117,37 +116,32 @@ class _RegisterPageState extends State<RegisterPage> {
                     width: 1000,
                     child: Column(
                       children: [
-                        PswManagerStrenght(
+                        PswManagerStrength(
                             icon: Icons.abc_rounded,
-                            contained: _passwordController.text
-                                    .includesLower() ||
+                            contained: _passwordController.text.includesLower() ||
                                 _passwordConfirmController.text.includesLower(),
                             text: 'Lettere minuscole'),
-                        PswManagerStrenght(
+                        PswManagerStrength(
                             icon: Icons.abc_rounded,
-                            contained: _passwordController.text
-                                    .includesUpper() ||
+                            contained: _passwordController.text.includesUpper() ||
                                 _passwordConfirmController.text.includesLower(),
                             text: 'Lettere maiuscole'),
-                        PswManagerStrenght(
+                        PswManagerStrength(
                             icon: Icons.numbers_rounded,
                             contained: _passwordController.text.includesNum() ||
                                 _passwordConfirmController.text.includesLower(),
                             text: 'Numeri'),
-                        PswManagerStrenght(
+                        PswManagerStrength(
                             contained: _passwordController.text.includesSym() ||
                                 _passwordConfirmController.text.includesLower(),
                             text: 'Simboli',
                             icon: Icons.emoji_symbols_rounded),
-                        PswManagerStrenght(
-                            contained: _passwordController.text ==
-                                _passwordConfirmController.text,
-                            text: _passwordController.text ==
-                                    _passwordConfirmController.text
+                        PswManagerStrength(
+                            contained: _passwordController.text == _passwordConfirmController.text,
+                            text: _passwordController.text == _passwordConfirmController.text
                                 ? 'Le password coincidono'
                                 : 'Le password non coincidono',
-                            icon: _passwordController.text ==
-                                    _passwordConfirmController.text
+                            icon: _passwordController.text == _passwordConfirmController.text
                                 ? Icons.check_rounded
                                 : Icons.close_rounded)
                       ],
@@ -161,39 +155,29 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: CustomButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          if (_passwordController.text ==
-                                  _passwordConfirmController.text &&
-                              _passwordController.text.meetsPasswordRequirement(
-                                  true, true, true, true)) {
+                          if (_passwordController.text == _passwordConfirmController.text &&
+                              _passwordController.text.meetsPasswordRequirement(true, true, true, true)) {
                             //crea l'utente
                             try {
                               await SupaBase().signUpNewUser(
-                                  _passwordController.text,
-                                  _emailController.text,
-                                  _usernameController.text);
+                                  _passwordController.text, _emailController.text, _usernameController.text);
                             } catch (e) {
                               if (mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12)),
-                                        behavior: SnackBarBehavior.floating,
-                                        content: Text(e.toString())));
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    behavior: SnackBarBehavior.floating,
+                                    content: Text(e.toString())));
                               }
                             } finally {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     behavior: SnackBarBehavior.floating,
                                     content: const Text(
                                         'Controlla la tua casella di posta elettronica per verificare il tuo account')));
                               }
 
-                              slideUpperNavigatorDialog(
-                                  EmailConfirmation(), context);
+                              slideUpperNavigatorDialog(EmailConfirmation(), context);
                             }
                           }
                         }
@@ -205,14 +189,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Hai già un account?',
-                        style: TextStyle(color: receiveDarkMode(true))),
+                    Text('Hai già un account?', style: TextStyle(color: receiveDarkMode(true))),
                     TextButton(
                         onPressed: widget.onTap,
                         child: Text(
                           'Accedi',
-                          style: TextStyle(
-                              color: primary, fontWeight: FontWeight.w600),
+                          style: TextStyle(color: primary, fontWeight: FontWeight.w600),
                         )),
                   ],
                 ),
@@ -240,16 +222,12 @@ class _RegisterPageState extends State<RegisterPage> {
                             return;
                           }
 
-                          await Supabase.instance.client.auth.signInWithOAuth(
-                              OAuthProvider.google,
-                              authScreenLaunchMode: kIsWeb
-                                  ? LaunchMode.platformDefault
-                                  : LaunchMode.externalApplication);
+                          await Supabase.instance.client.auth.signInWithOAuth(OAuthProvider.google,
+                              authScreenLaunchMode:
+                                  kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication);
                         },
                         backgroundButtonColor: Colors.red.shade400,
-                        child: Text('Registrati con Google',
-                            style:
-                                const TextStyle(fontWeight: FontWeight.w600))),
+                        child: Text('Registrati con Google', style: const TextStyle(fontWeight: FontWeight.w600))),
                   )
               ],
             ),
