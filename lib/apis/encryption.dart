@@ -58,3 +58,42 @@ class Encryption {
     return decrypted;
   }
 }
+
+/* class Encryption2 {
+  // Prepara l'UID come chiave sicura
+  String formatKey() {
+    String uid = Supabase.instance.client.auth.currentUser!.id;
+    var bytes = utf8.encode(uid);
+    var digest = sha256.convert(bytes);
+    return digest.toString().substring(0, 32); // Assicura una chiave AES valida
+  }
+
+  // Cifra il testo in input
+  Map<String, String> encryptData(String text) {
+    final encryptionKey = encrypt.Key.fromUtf8(formatKey());
+    final iv = encrypt.IV.fromLength(16); // IV casuale
+
+    final encrypter = encrypt.Encrypter(
+        encrypt.AES(encryptionKey, mode: encrypt.AESMode.cbc));
+
+    final encrypted = encrypter.encrypt(text, iv: iv);
+
+    return {
+      "encryptedData": encrypted.base64,
+      "iv": iv.base64 // Salva IV separatamente
+    };
+  }
+
+  // Decifra il testo in input
+  String decryptData(String encryptedText, String ivBase64) {
+    final encryptionKey = encrypt.Key.fromUtf8(formatKey());
+    final iv = encrypt.IV.fromBase64(ivBase64); // Usa IV salvato
+
+    final encrypter = encrypt.Encrypter(
+        encrypt.AES(encryptionKey, mode: encrypt.AESMode.cbc));
+
+    final encrypted = encrypt.Encrypted.fromBase64(encryptedText);
+
+    return encrypter.decrypt(encrypted, iv: iv);
+  }
+} */

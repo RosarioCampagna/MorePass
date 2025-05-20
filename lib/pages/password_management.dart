@@ -91,185 +91,180 @@ class _PasswordManagementState extends State<PasswordManagement> {
           )
         ],
       ),
-      body: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-            child: SizedBox(
+      body: Center(
+        child: Form(
+            key: _formKey,
+            child: Container(
               width: double.infinity,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          //textfield del provider
-                          CustomTextField(
-                              leadingIcon: Icons.web_asset_rounded,
-                              hint: 'Provider',
-                              error: 'Inserire un provider',
-                              controller: _providerController,
-                              filled: false),
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 5),
+                    //textfield del provider
+                    CustomTextField(
+                        leadingIcon: Icons.web_asset_rounded,
+                        hint: 'Provider',
+                        error: 'Inserire un provider',
+                        controller: _providerController,
+                        filled: false),
 
-                          // textfiel dell'username
-                          CustomTextField(
-                              leadingIcon: Icons.person,
-                              hint: 'Username',
-                              error: 'Inserire un username',
-                              controller: _usernameController,
-                              filled: false),
+                    // textfiel dell'username
+                    CustomTextField(
+                        leadingIcon: Icons.person,
+                        hint: 'Username',
+                        error: 'Inserire un username',
+                        controller: _usernameController,
+                        filled: false),
 
-                          //textfield della password
-                          CustomTextField(
-                              leadingIcon: Icons.key_rounded,
-                              hint: 'Password',
-                              error: 'Inserire una password',
-                              controller: _passwordController,
-                              filled: false,
-                              onChanged: () => setState(() {}),
-                              visible: true),
+                    //textfield della password
+                    CustomTextField(
+                        leadingIcon: Icons.key_rounded,
+                        hint: 'Password',
+                        error: 'Inserire una password',
+                        controller: _passwordController,
+                        filled: false,
+                        onChanged: () => setState(() {}),
+                        visible: true),
 
-                          //forza della password
-                          if (_passwordController.text.isNotEmpty)
-                            Container(
-                              padding: EdgeInsets.only(bottom: 15, left: 10),
-                              width: MediaQuery.of(context).size.width > 1000
-                                  ? 1000
-                                  : double.infinity,
-                              child: Row(
-                                children: [
-                                  Text(
-                                    '${strongText(isStrong(_passwordController.text))}. ',
-                                    style: TextStyle(
-                                        color: passwordStrenght(
-                                            _passwordController.text),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400),
-                                  ),
-                                  if (isStrong(_passwordController.text) !=
-                                          'Very strong' ||
-                                      isStrong(_passwordController.text) !=
-                                          'Strong')
-                                    FittedBox(
-                                      child: TextButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                              context,
-                                              slideLeftNavigator(
-                                                  PasswordGeneratorPage()));
-                                        },
-                                        child: Text(
-                                          'Prova il nostro generatore di password',
-                                          style: TextStyle(
-                                              color: primary,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                      ),
-                                    )
-                                ],
-                              ),
+                    //forza della password
+                    if (_passwordController.text.isNotEmpty)
+                      Container(
+                        padding: EdgeInsets.only(bottom: 15, left: 10),
+                        width: MediaQuery.of(context).size.width > 1000
+                            ? 1000
+                            : double.infinity,
+                        child: Wrap(
+                          children: [
+                            const SizedBox(width: 12),
+                            Text(
+                              '${strongText(isStrong(_passwordController.text))}. ',
+                              style: TextStyle(
+                                  color: passwordStrenght(
+                                      _passwordController.text),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400),
                             ),
-
-                          //textfield delle note
-                          CustomTextField(
-                              leadingIcon: const IconData(0xf472,
-                                  fontFamily: CupertinoIcons.iconFont,
-                                  fontPackage: CupertinoIcons.iconFontPackage),
-                              hint: 'Note',
-                              error: 'Inserire una nota',
-                              controller: _notesController,
-                              filled: false),
-
-                          Container(
-                            padding: const EdgeInsets.only(left: 10),
-                            decoration: BoxDecoration(
-                                color: receiveDarkMode(false),
-                                border: Border.all(color: primary, width: 2),
-                                borderRadius: BorderRadius.circular(12)),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Categoria:',
+                            if (isStrong(_passwordController.text) !=
+                                    'Very strong' &&
+                                isStrong(_passwordController.text) != 'Strong')
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      slideLeftNavigator(
+                                          PasswordGeneratorPage()));
+                                },
+                                child: Text(
+                                  'Prova il nostro generatore di password!',
                                   style: TextStyle(
-                                      color: receiveDarkMode(true),
-                                      fontSize: 16),
+                                      color: primary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                DropdownButtonHideUnderline(
-                                  child: DropdownButton(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      style: TextStyle(
-                                          color: receiveDarkMode(true),
-                                          fontSize: 16),
-                                      dropdownColor: receiveDarkMode(false),
-                                      borderRadius: BorderRadius.circular(12),
-                                      value: category,
-                                      items: ['Login', 'Wifi', 'Altro']
-                                          .map((item) => DropdownMenuItem(
-                                                value: item,
-                                                child: Text(item),
-                                              ))
-                                          .toList(),
-                                      onChanged: (value) {
-                                        setState(() {
-                                          category = value!;
-                                        });
-                                      }),
-                                ),
-                              ],
-                            ),
+                              )
+                          ],
+                        ),
+                      ),
+
+                    //textfield delle note
+                    CustomTextField(
+                        leadingIcon: const IconData(0xf472,
+                            fontFamily: CupertinoIcons.iconFont,
+                            fontPackage: CupertinoIcons.iconFontPackage),
+                        hint: 'Note',
+                        error: 'Inserire una nota',
+                        controller: _notesController,
+                        filled: false),
+
+                    Container(
+                      padding: const EdgeInsets.only(left: 10),
+                      decoration: BoxDecoration(
+                          color: receiveDarkMode(false),
+                          border: Border.all(color: primary, width: 2),
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Categoria:',
+                            style: TextStyle(
+                                color: receiveDarkMode(true), fontSize: 16),
                           ),
-                        ]),
-                  ),
+                          DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                style: TextStyle(
+                                    color: receiveDarkMode(true), fontSize: 16),
+                                dropdownColor: receiveDarkMode(false),
+                                borderRadius: BorderRadius.circular(12),
+                                value: category,
+                                items: ['Login', 'Wifi', 'Altro']
+                                    .map((item) => DropdownMenuItem(
+                                          value: item,
+                                          child: Text(item),
+                                        ))
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    category = value!;
+                                  });
+                                }),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                  //tasto per inserire la password
-                  CustomButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          //controlla se la password esiste
-                          if (widget.password != null) {
-                            //modifica la password
-                            SupaBase().updatePassword(
-                                widget.password!,
-                                Passwords(
-                                    provider: _providerController.text,
-                                    username: _usernameController.text,
-                                    password: _passwordController.text,
-                                    notes: _notesController.text.isEmpty
-                                        ? 'Nessuna nota'
-                                        : _notesController.text,
-                                    category: category));
-                          } else {
-                            //inserisci la password
-                            SupaBase().insertPassword(Passwords(
-                                provider: _providerController.text,
-                                username: _usernameController.text,
-                                password: _passwordController.text,
-                                notes: _notesController.text.isEmpty
-                                    ? 'Nessuna nota'
-                                    : _notesController.text,
-                                category: category));
+                    const SizedBox(height: 20),
+
+                    //tasto per inserire la password
+                    CustomButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            //controlla se la password esiste
+                            if (widget.password != null) {
+                              //modifica la password
+                              SupaBase().updatePassword(
+                                  widget.password!,
+                                  Passwords(
+                                      provider: _providerController.text,
+                                      username: _usernameController.text,
+                                      password: _passwordController.text,
+                                      notes: _notesController.text.isEmpty
+                                          ? 'Nessuna nota'
+                                          : _notesController.text,
+                                      category: category));
+                            } else {
+                              //inserisci la password
+                              SupaBase().insertPassword(Passwords(
+                                  provider: _providerController.text,
+                                  username: _usernameController.text,
+                                  password: _passwordController.text,
+                                  notes: _notesController.text.isEmpty
+                                      ? 'Nessuna nota'
+                                      : _notesController.text,
+                                  category: category));
+                            }
+
+                            //ritorna alla pagina di prima
+                            Navigator.pop(context);
                           }
-
-                          //ritorna alla pagina di prima
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: widget.password != null
-                          ? Text('Aggiorna Password',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.w600))
-                          : Text('Aggiungi password',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600))),
-                ],
+                        },
+                        child: widget.password != null
+                            ? Text('Aggiorna Password',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600))
+                            : Text('Aggiungi password',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600))),
+                  ],
+                ),
               ),
-            ),
-          )),
+            )),
+      ),
     );
   }
 }

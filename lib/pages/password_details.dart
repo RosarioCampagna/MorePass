@@ -285,7 +285,7 @@ class _PasswordDetailsState extends State<PasswordDetails> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.abc),
+                          Icon(Icons.edit_document),
                           const SizedBox(width: 10),
                           Text('Modifica password',
                               style: TextStyle(fontWeight: FontWeight.w600))
