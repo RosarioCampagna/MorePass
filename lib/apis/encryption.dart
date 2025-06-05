@@ -1,5 +1,10 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'dart:convert';
+import 'dart:math';
+import 'package:argon2/argon2.dart';
+import 'dart:typed_data';
+import 'package:crypto/crypto.dart' as crypto;
 
 class Encryption {
   //prepara la stringa per generare la chiave
@@ -59,41 +64,107 @@ class Encryption {
   }
 }
 
-/* class Encryption2 {
-  // Prepara l'UID come chiave sicura
-  String formatKey() {
-    String uid = Supabase.instance.client.auth.currentUser!.id;
-    var bytes = utf8.encode(uid);
-    var digest = sha256.convert(bytes);
-    return digest.toString().substring(0, 32); // Assicura una chiave AES valida
+/* INTEGRAZIONE MIGLIORATA */
+
+class EncryptionHelper {
+  // Utilizziamo 64 byte derivati tramite Argon2.
+  // I primi 32 per AES-256; i successivi 32 per l'HMAC.
+  static const int derivedKeyLength = 64;
+
+  /// Genera un salt casuale di [length] byte e lo restituisce in Base64.
+  String generateSalt({int length = 16}) {
+    final random = Random.secure();
+    final saltBytes = List<int>.generate(length, (_) => random.nextInt(256));
+    return base64UrlEncode(saltBytes);
   }
 
-  // Cifra il testo in input
-  Map<String, String> encryptData(String text) {
-    final encryptionKey = encrypt.Key.fromUtf8(formatKey());
-    final iv = encrypt.IV.fromLength(16); // IV casuale
+  /// Deriva una chiave di 64 byte utilizzando Argon2Iid a partire da [masterPassword] e [salt].
+  Uint8List deriveKey(String masterPassword, String salt) {
+    final Uint8List passwordBytes =
+        Uint8List.fromList(utf8.encode(masterPassword));
+    final Uint8List saltBytes = Uint8List.fromList(utf8.encode(salt));
+
+    final parameters = Argon2Parameters(
+      Argon2Parameters.ARGON2_id,
+      saltBytes,
+      iterations: 3, // Aumenta questo valore per maggiore sicurezza
+      memory: 65536, // Memoria in KiB (circa 64 MB)
+      lanes: 4, // Grado di parallelismo
+    );
+
+    final argon2 = Argon2BytesGenerator();
+    argon2.init(parameters);
+
+    final output = Uint8List(derivedKeyLength);
+    argon2.generateBytes(passwordBytes, output);
+    return output;
+  }
+
+  /// Cifra [plainText] usando AES-CBC con PKCS7 padding.
+  /// Le chiavi sono derivate con Argon2 a partire da [masterPassword] e [salt]:
+  /// - I primi 32 byte sono la chiave di cifratura (AES-256).
+  /// - I successivi 32 byte sono la chiave per l'HMAC.
+  /// Viene generato un IV casuale; il messaggio finale ha formato:
+  /// "iv:ciphertext:hmac", dove ciascuna parte è codificata in Base64.
+  String encryptData(String plainText, String masterPassword, String salt) {
+    final keyBytes = deriveKey(masterPassword, salt);
+    final encryptionKey = encrypt.Key(keyBytes.sublist(0, 32));
+    final hmacKey = keyBytes.sublist(32, 64);
+
+    // Genera un IV casuale di 16 byte.
+    final iv = encrypt.IV.fromSecureRandom(16);
 
     final encrypter = encrypt.Encrypter(
-        encrypt.AES(encryptionKey, mode: encrypt.AESMode.cbc));
+      encrypt.AES(encryptionKey, mode: encrypt.AESMode.cbc, padding: 'PKCS7'),
+    );
 
-    final encrypted = encrypter.encrypt(text, iv: iv);
+    final encrypted = encrypter.encrypt(plainText, iv: iv);
 
-    return {
-      "encryptedData": encrypted.base64,
-      "iv": iv.base64 // Salva IV separatamente
-    };
+    // Calcola l'HMAC sul concatenato di IV e ciphertext.
+    final hmacData = iv.bytes + encrypted.bytes;
+    final hmac = crypto.Hmac(crypto.sha256, hmacKey);
+    final hmacDigest = hmac.convert(hmacData);
+    final hmacBase64 = base64Encode(hmacDigest.bytes);
+
+    // Combina iv, ciphertext e hmac separati da ':'.
+    final combined = '${iv.base64}:${encrypted.base64}:$hmacBase64';
+    return combined;
   }
 
-  // Decifra il testo in input
-  String decryptData(String encryptedText, String ivBase64) {
-    final encryptionKey = encrypt.Key.fromUtf8(formatKey());
-    final iv = encrypt.IV.fromBase64(ivBase64); // Usa IV salvato
+  /// Decifra [encryptedData] (formato "iv:ciphertext:hmac").
+  /// Verifica l'HMAC e, se valido, decifra restituendo il testo in chiaro.
+  String decryptData(String encryptedData, String masterPassword, String salt) {
+    final parts = encryptedData.split(':');
+    if (parts.length != 3) {
+      throw Exception('Formato del messaggio cifrato non valido');
+    }
+
+    final ivBase64 = parts[0];
+    final ciphertextBase64 = parts[1];
+    final providedHmac = parts[2];
+
+    final keyBytes = deriveKey(masterPassword, salt);
+    final encryptionKey = encrypt.Key(keyBytes.sublist(0, 32));
+    final hmacKey = keyBytes.sublist(32, 64);
+
+    final iv = encrypt.IV.fromBase64(ivBase64);
+    final ciphertext = encrypt.Encrypted.fromBase64(ciphertextBase64);
+
+    // Ricalcola l'HMAC.
+    final hmacData = iv.bytes + ciphertext.bytes;
+    final hmac = crypto.Hmac(crypto.sha256, hmacKey);
+    final computedHmacDigest = hmac.convert(hmacData);
+    final computedHmacBase64 = base64Encode(computedHmacDigest.bytes);
+
+    if (computedHmacBase64 != providedHmac) {
+      throw Exception('Integrità del messaggio compromessa: HMAC non valido.');
+    }
 
     final encrypter = encrypt.Encrypter(
-        encrypt.AES(encryptionKey, mode: encrypt.AESMode.cbc));
+      encrypt.AES(encryptionKey, mode: encrypt.AESMode.cbc, padding: 'PKCS7'),
+    );
 
-    final encrypted = encrypt.Encrypted.fromBase64(encryptedText);
-
-    return encrypter.decrypt(encrypted, iv: iv);
+    final decrypted = encrypter.decrypt(ciphertext, iv: iv);
+    return decrypted;
   }
-} */
+}

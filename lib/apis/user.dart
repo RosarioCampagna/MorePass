@@ -4,20 +4,25 @@ class Users {
   bool first;
   String? creato;
   String? uid;
+  String salt;
 
   Users(
       {this.id,
       required this.color,
       required this.first,
       this.creato,
-      this.uid});
+      this.uid,
+      required this.salt});
 
   factory Users.fromJson(Map<String, dynamic> json) => Users(
-      id: json['id'],
-      color: json['color'],
-      first: json['first'],
-      creato: json['creato'],
-      uid: json['uid']);
+        id: json['id'],
+        color: json['color'],
+        first: json['first'],
+        creato: json['creato'],
+        uid: json['uid'],
+        salt: json['salt'],
+      );
 
-  Map<String, dynamic> toJson() => {'color': color, 'first': first};
+  Map<String, dynamic> toJson() =>
+      {'color': color, 'first': first, 'salt': salt};
 }
