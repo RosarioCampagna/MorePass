@@ -37,10 +37,7 @@ Future<void> setDarkMode() async {
 Color secondaryDark = Colors.grey.shade900;
 Color secondaryLight = Colors.grey.shade100;
 
-ThemeData theme = ThemeData(
-    scaffoldBackgroundColor: receiveDarkMode(false),
-    primaryColor: primary,
-    useMaterial3: true);
+ThemeData theme = ThemeData(scaffoldBackgroundColor: receiveDarkMode(false), primaryColor: primary, useMaterial3: true);
 
 Color receiveDarkMode(bool reverted) {
   return darkMode

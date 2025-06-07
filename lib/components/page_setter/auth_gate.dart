@@ -38,7 +38,8 @@ class AUthGate extends StatelessWidget {
                           : MediaQuery.of(context).size.width < 1000
                               ? const Homepage()
                               : PasswordListDesktop();
-                    })
+                    },
+                  )
                 : const LoginRegister();
           }),
     );

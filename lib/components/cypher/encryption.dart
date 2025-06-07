@@ -1,4 +1,3 @@
-import 'package:morepass/cypher/pbkdf2_encryption.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'dart:convert';
@@ -64,8 +63,6 @@ class Encryption {
 /* INTEGRAZIONE MIGLIORATA */
 
 class EncryptionHelper {
-  static const int derivedKeyLength = 64;
-
   /// Genera un salt casuale di [length] byte.
   /// Il salt viene generato usando Random.secure e viene restituito come Uint8List.
   Uint8List generateSalt({int length = 16}) {
@@ -74,12 +71,24 @@ class EncryptionHelper {
     return Uint8List.fromList(saltBytes);
   }
 
-  /// Cifra [plainText] utilizzando AES-CBC con PKCS7 padding e genera un HMAC-SHA256 per l'autenticità.
-  /// La chiave è derivata tramite PBKDF2 (con SHA256) da [masterPassword] e [salt].
+  Uint8List deriveKeyDirect(String masterPassword, Uint8List salt) {
+    final input = masterPassword + base64Encode(salt);
+    final hash = crypto.sha512.convert(utf8.encode(input)).bytes;
+    return Uint8List.fromList(hash); // 64 byte
+  }
+
+  /// Cifra il testo usando direttamente la master password.
+  ///
+  /// La funzione esegue:
+  ///  1. Derivazione della chiave tramite SHA-512 (funzione sincrona)
+  ///  2. Divisone dei 64 byte in:
+  ///     • 32 byte per AES-CBC
+  ///     • 32 byte per HMAC-SHA256
+  ///  3. Generazione casuale dell'IV e cifratura del plaintext.
+  ///  4. Calcolo dell'HMAC sui byte concatenati (IV + ciphertext).
   String encryptData(String plainText, String masterPassword, Uint8List salt) {
     // Deriva chiave a 64 byte: i primi 32 per AES, gli altri 32 per HMAC.
-    final keyBytes =
-        PBKDF2Encryption().deriveKey(masterPassword, salt, iterations: 100000, keyLength: derivedKeyLength);
+    final keyBytes = deriveKeyDirect(masterPassword, salt);
     final encryptionKey = encrypt.Key(Uint8List.fromList(keyBytes.sublist(0, 32)));
     final hmacKey = keyBytes.sublist(32, 64);
 
@@ -100,7 +109,12 @@ class EncryptionHelper {
     return "${iv.base64}:${encrypted.base64}:$hmacBase64";
   }
 
-  /// Decifra [encryptedData] (formato "iv:ciphertext:hmac") e verifica l'HMAC per assicurare l'integrità.
+  /// Decifra il testo cifrato usando direttamente la master password.
+  ///
+  /// La funzione esegue i passaggi inversi:
+  ///  1. Deriva la chiave dalla master password (e dal salt) con SHA‑512.
+  ///  2. Divide la chiave in AES e HMAC
+  ///  3. Verifica l'HMAC e, se valido, decripta il ciphertext.
   String decryptData(String encryptedData, String masterPassword, Uint8List salt) {
     final parts = encryptedData.split(':');
     if (parts.length != 3) {
@@ -111,8 +125,7 @@ class EncryptionHelper {
     final ciphertext = encrypt.Encrypted.fromBase64(parts[1]);
     final providedHmac = parts[2];
 
-    final keyBytes =
-        PBKDF2Encryption().deriveKey(masterPassword, salt, iterations: 100000, keyLength: derivedKeyLength);
+    final keyBytes = deriveKeyDirect(masterPassword, salt);
     final encryptionKey = encrypt.Key(Uint8List.fromList(keyBytes.sublist(0, 32)));
     final hmacKey = keyBytes.sublist(32, 64);
 

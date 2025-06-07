@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:morepass/apis/password_generator.dart';
 import 'package:morepass/components/colors.dart';
 import 'package:morepass/components/custom_components/custom_button.dart';
@@ -20,9 +21,8 @@ class PasswordDetails extends StatefulWidget {
 
 class _PasswordDetailsState extends State<PasswordDetails> {
   IconData setIcon(String category) {
-    const IconData globe = IconData(0xf68d,
-        fontFamily: CupertinoIcons.iconFont,
-        fontPackage: CupertinoIcons.iconFontPackage);
+    const IconData globe =
+        IconData(0xf68d, fontFamily: CupertinoIcons.iconFont, fontPackage: CupertinoIcons.iconFontPackage);
     switch (category) {
       case 'Login':
         return globe;
@@ -78,10 +78,7 @@ class _PasswordDetailsState extends State<PasswordDetails> {
               //nome del provider
               Text(
                 widget.password.provider,
-                style: TextStyle(
-                    color: receiveDarkMode(true),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600),
+                style: TextStyle(color: receiveDarkMode(true), fontSize: 20, fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -132,18 +129,13 @@ class _PasswordDetailsState extends State<PasswordDetails> {
                 //testo dell'username
                 Text(
                   widget.password.username,
-                  style: TextStyle(
-                      color: receiveDarkMode(true),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
+                  style: TextStyle(color: receiveDarkMode(true), fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Divider(
-                  color: darkMode ? Colors.grey.shade600 : Colors.grey.shade400,
-                  thickness: 1.5),
+              child: Divider(color: darkMode ? Colors.grey.shade600 : Colors.grey.shade400, thickness: 1.5),
             ),
 
             //sezione della password
@@ -167,13 +159,8 @@ class _PasswordDetailsState extends State<PasswordDetails> {
 
                 //testo della password
                 Text(
-                  visible
-                      ? widget.password.password
-                      : notVisiblePassword(widget.password.password),
-                  style: TextStyle(
-                      color: receiveDarkMode(true),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
+                  visible ? widget.password.password : notVisiblePassword(widget.password.password),
+                  style: TextStyle(color: receiveDarkMode(true), fontSize: 16, fontWeight: FontWeight.w600),
                 ),
                 Spacer(),
 
@@ -183,29 +170,38 @@ class _PasswordDetailsState extends State<PasswordDetails> {
                           visible = !visible;
                         }),
                     icon: visible
-                        ? Icon(Icons.visibility_off,
-                            color: receiveDarkMode(true))
-                        : Icon(Icons.visibility, color: receiveDarkMode(true)))
+                        ? Icon(Icons.visibility_off, color: receiveDarkMode(true))
+                        : Icon(Icons.visibility, color: receiveDarkMode(true))),
+
+                //tasto per copiare il testo della password
+                IconButton(
+                    onPressed: () {
+                      //copia il testo
+                      Clipboard.setData(ClipboardData(text: widget.password.password));
+
+                      //notificalo all'utente
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          behavior: SnackBarBehavior.floating,
+                          content: Text('Testo copiato con successo')));
+                    },
+                    icon: Icon(Icons.copy_rounded, color: receiveDarkMode(true)))
               ],
             ),
 
-            //testo della password
+            //testo forza della password
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 2.5),
               child: Text(
                 strongText(isStrong(widget.password.password)),
                 style: TextStyle(
-                    color: passwordStrenght(widget.password.password),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400),
+                    color: passwordStrenght(widget.password.password), fontSize: 16, fontWeight: FontWeight.w400),
               ),
             ),
 
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Divider(
-                  color: darkMode ? Colors.grey.shade600 : Colors.grey.shade400,
-                  thickness: 1.5),
+              child: Divider(color: darkMode ? Colors.grey.shade600 : Colors.grey.shade400, thickness: 1.5),
             ),
 
             //sezione delle note
@@ -225,8 +221,7 @@ class _PasswordDetailsState extends State<PasswordDetails> {
                 //icona delle note
                 Icon(
                     const IconData(0xf472,
-                        fontFamily: CupertinoIcons.iconFont,
-                        fontPackage: CupertinoIcons.iconFontPackage),
+                        fontFamily: CupertinoIcons.iconFont, fontPackage: CupertinoIcons.iconFontPackage),
                     color: receiveDarkMode(true)),
 
                 const SizedBox(width: 10),
@@ -234,18 +229,14 @@ class _PasswordDetailsState extends State<PasswordDetails> {
                 //testo delle note
                 Text(
                   widget.password.notes,
-                  style: TextStyle(
-                      color: receiveDarkMode(true),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
+                  style: TextStyle(color: receiveDarkMode(true), fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
+
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Divider(
-                  color: darkMode ? Colors.grey.shade600 : Colors.grey.shade400,
-                  thickness: 1.5),
+              child: Divider(color: darkMode ? Colors.grey.shade600 : Colors.grey.shade400, thickness: 1.5),
             ),
 
             //sezione della categoria
@@ -262,10 +253,7 @@ class _PasswordDetailsState extends State<PasswordDetails> {
             //testo della categoria
             Text(
               widget.password.category,
-              style: TextStyle(
-                  color: receiveDarkMode(true),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600),
+              style: TextStyle(color: receiveDarkMode(true), fontSize: 16, fontWeight: FontWeight.w600),
             ),
 
             Spacer(),
@@ -277,18 +265,14 @@ class _PasswordDetailsState extends State<PasswordDetails> {
                   flex: 3,
                   child: CustomButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            slideLeftNavigator(
-                                PasswordManagement(password: widget.password)));
+                        Navigator.push(context, slideLeftNavigator(PasswordManagement(password: widget.password)));
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.edit_document),
                           const SizedBox(width: 10),
-                          Text('Modifica password',
-                              style: TextStyle(fontWeight: FontWeight.w600))
+                          Text('Modifica password', style: TextStyle(fontWeight: FontWeight.w600))
                         ],
                       )),
                 ),
@@ -301,27 +285,19 @@ class _PasswordDetailsState extends State<PasswordDetails> {
                         showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                                  backgroundColor:
-                                      darkMode ? secondaryDark : secondaryLight,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
+                                  backgroundColor: darkMode ? secondaryDark : secondaryLight,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   content: Text(
                                       'Sicuro di voler eliminare la password? Questa operazione non è reversibile!',
-                                      style: TextStyle(
-                                          color: darkMode
-                                              ? secondaryLight
-                                              : secondaryDark)),
+                                      style: TextStyle(color: darkMode ? secondaryLight : secondaryDark)),
                                   actionsAlignment: MainAxisAlignment.center,
                                   actions: [
                                     TextButton(
                                         onPressed: () => Navigator.pop(context),
-                                        child: Text('Annulla',
-                                            style: TextStyle(
-                                                color: receiveDarkMode(true)))),
+                                        child: Text('Annulla', style: TextStyle(color: receiveDarkMode(true)))),
                                     TextButton(
                                         onPressed: () async {
-                                          await SupaBase().deletePassword(
-                                              widget.password, 'passwords');
+                                          await SupaBase().deletePassword(widget.password, 'passwords');
                                           Navigator.pop(context);
 
                                           //ritorna alla pagina di prima

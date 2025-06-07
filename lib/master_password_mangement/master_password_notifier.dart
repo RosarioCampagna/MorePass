@@ -5,7 +5,9 @@ class MasterPasswordNotifier extends ChangeNotifier {
   final MasterPasswordStorage storage;
   String? masterPassword;
 
-  MasterPasswordNotifier({required this.storage});
+  MasterPasswordNotifier({required this.storage}) {
+    loadMasterPassword();
+  }
 
   /// Carica la master password dal secure storage.
   Future<void> loadMasterPassword() async {

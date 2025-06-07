@@ -21,8 +21,7 @@ class SettingsPageDesktop extends StatefulWidget {
 
 class _SettingsPageDesktopState extends State<SettingsPageDesktop> {
   bool isGoogleLinked() {
-    final List<UserIdentity> identities =
-        Supabase.instance.client.auth.currentUser!.identities!;
+    final List<UserIdentity> identities = Supabase.instance.client.auth.currentUser!.identities!;
 
     for (UserIdentity identity in identities) {
       if (identity.provider == 'google') {
@@ -46,78 +45,64 @@ class _SettingsPageDesktopState extends State<SettingsPageDesktop> {
                 height: MediaQuery.of(context).size.height - 10,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                    color: darkMode
-                        ? const Color.fromARGB(255, 40, 40, 40)
-                        : Colors.grey.shade300,
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(12),
-                        bottomRight: Radius.circular(12))),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      //header delle impostazioni
-                      Text(
-                        'Impostazioni',
-                        maxLines: 2,
-                        overflow: TextOverflow.visible,
-                        softWrap: true,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            fontSize: 20,
-                            overflow: TextOverflow.visible,
-                            color: receiveDarkMode(true)),
-                      ),
+                    color: darkMode ? const Color.fromARGB(255, 40, 40, 40) : Colors.grey.shade300,
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(12), bottomRight: Radius.circular(12))),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  //header delle impostazioni
+                  Text(
+                    'Impostazioni',
+                    maxLines: 2,
+                    overflow: TextOverflow.visible,
+                    softWrap: true,
+                    textAlign: TextAlign.start,
+                    style: TextStyle(fontSize: 20, overflow: TextOverflow.visible, color: receiveDarkMode(true)),
+                  ),
 
-                      const SizedBox(height: 40),
+                  const SizedBox(height: 40),
 
-                      DesktopNavigatorTile(
-                        icon: Icons.key_rounded,
-                        selected: false,
-                        label: 'Vault',
-                        onTap: () => Navigator.pushAndRemoveUntil(context,
-                            slideDownNavigator(const AUthGate()), (_) => false),
-                      ),
+                  DesktopNavigatorTile(
+                    icon: Icons.key_rounded,
+                    selected: false,
+                    label: 'Vault',
+                    onTap: () =>
+                        Navigator.pushAndRemoveUntil(context, slideDownNavigator(const AUthGate()), (_) => false),
+                  ),
 
-                      //navigator che porta alla generazione di password
-                      DesktopNavigatorTile(
-                        icon: Icons.refresh_rounded,
-                        selected: false,
-                        label: 'Genera password',
-                        onTap: () => Navigator.pushAndRemoveUntil(
-                            context,
-                            slideDownNavigator(const PasswordGeneratorPage()),
-                            (_) => false),
-                      ),
+                  //navigator che porta alla generazione di password
+                  DesktopNavigatorTile(
+                    icon: Icons.refresh_rounded,
+                    selected: false,
+                    label: 'Genera password',
+                    onTap: () => Navigator.pushAndRemoveUntil(
+                        context, slideDownNavigator(const PasswordGeneratorPage()), (_) => false),
+                  ),
 
-                      //navigator che porta alle impostazioni
-                      DesktopNavigatorTile(
-                        icon: Icons.person_rounded,
-                        selected: true,
-                        label: 'Impostazioni',
-                      ),
-                    ])),
+                  //navigator che porta alle impostazioni
+                  DesktopNavigatorTile(
+                    icon: Icons.person_rounded,
+                    selected: true,
+                    label: 'Impostazioni',
+                  ),
+                ])),
 
             //schermata delle impostazioni
             Expanded(
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 25),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     //tile to display email
                     SettingsTile(
                       title: 'Email',
-                      subtitle:
-                          Supabase.instance.client.auth.currentUser!.email!,
+                      subtitle: Supabase.instance.client.auth.currentUser!.email!,
                       icon: Icons.email_rounded,
                     ),
 
                     //tile for the username
                     SettingsTile(
                       title: 'Username',
-                      subtitle: Supabase.instance.client.auth.currentUser!
-                          .userMetadata!.entries
+                      subtitle: Supabase.instance.client.auth.currentUser!.userMetadata!.entries
                           .firstWhere((value) => value.key == 'displayName')
                           .value,
                       icon: Icons.person_rounded,
@@ -128,18 +113,13 @@ class _SettingsPageDesktopState extends State<SettingsPageDesktop> {
                             showDialog(
                                 context: context,
                                 builder: (context) {
-                                  final TextEditingController
-                                      newUsernameController =
-                                      TextEditingController();
+                                  final TextEditingController newUsernameController = TextEditingController();
 
-                                  final GlobalKey<FormState> formKey =
-                                      GlobalKey<FormState>();
+                                  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
                                   return AlertDialog(
                                     backgroundColor: receiveDarkMode(false),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     content: Form(
                                         key: formKey,
                                         child: SizedBox(
@@ -155,27 +135,19 @@ class _SettingsPageDesktopState extends State<SettingsPageDesktop> {
                                     actions: [
                                       //tasto per annullare
                                       TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: Text('Annulla',
-                                              style: TextStyle(
-                                                  color:
-                                                      receiveDarkMode(true)))),
+                                          onPressed: () => Navigator.pop(context),
+                                          child: Text('Annulla', style: TextStyle(color: receiveDarkMode(true)))),
 
                                       //tasto per confermare
                                       TextButton(
                                           onPressed: () async {
-                                            if (formKey.currentState!
-                                                .validate()) {
-                                              await SupaBase().updateUsername(
-                                                  newUsernameController.text);
+                                            if (formKey.currentState!.validate()) {
+                                              await SupaBase().updateUsername(newUsernameController.text);
                                               setState(() {});
                                               Navigator.pop(context);
                                             }
                                           },
-                                          child: Text('Conferma',
-                                              style:
-                                                  TextStyle(color: primary))),
+                                          child: Text('Conferma', style: TextStyle(color: primary))),
                                     ],
                                   );
                                 });
@@ -185,11 +157,8 @@ class _SettingsPageDesktopState extends State<SettingsPageDesktop> {
 
                     //tasto che reindirizza alla scelta del tema
                     CustomButton(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/themeChoosing'),
-                        child: Text('Cambia il tema dell\'app',
-                            style:
-                                const TextStyle(fontWeight: FontWeight.w600))),
+                        onPressed: () => Navigator.pushNamed(context, '/themeChoosing'),
+                        child: Text('Cambia il tema dell\'app', style: const TextStyle(fontWeight: FontWeight.w600))),
 
                     const Spacer(),
 
@@ -200,28 +169,23 @@ class _SettingsPageDesktopState extends State<SettingsPageDesktop> {
                             Expanded(
                               child: CustomButton(
                                   onPressed: () async {
-                                    await Supabase.instance.client.auth
-                                        .linkIdentity(OAuthProvider.google);
+                                    await Supabase.instance.client.auth.linkIdentity(OAuthProvider.google);
                                   },
                                   backgroundButtonColor: Colors.red.shade400,
                                   child: Text('Collega account Google',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600))),
+                                      style: const TextStyle(fontWeight: FontWeight.w600))),
                             )
                           else
                             Expanded(
                               child: CustomButton(
                                   onPressed: () async {
-                                    await Supabase.instance.client.auth
-                                        .unlinkIdentity(Supabase.instance.client
-                                            .auth.currentUser!.identities!
-                                            .firstWhere((identity) =>
-                                                identity.provider == 'google'));
+                                    await Supabase.instance.client.auth.unlinkIdentity(Supabase
+                                        .instance.client.auth.currentUser!.identities!
+                                        .firstWhere((identity) => identity.provider == 'google'));
                                   },
                                   backgroundButtonColor: Colors.red.shade400,
                                   child: Text('Scollega account Google',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w600))),
+                                      style: const TextStyle(fontWeight: FontWeight.w600))),
                             ),
                       ],
                     ),
@@ -233,15 +197,10 @@ class _SettingsPageDesktopState extends State<SettingsPageDesktop> {
                         onPressed: () {
                           SupaBase().signOut();
                           Navigator.pushAndRemoveUntil(
-                              context,
-                              slideLeftNavigator(const AUthGate()),
-                              (predicate) => false);
+                              context, slideLeftNavigator(const AUthGate()), (predicate) => false);
                         },
-                        backgroundButtonColor:
-                            const Color.fromARGB(255, 192, 39, 29),
-                        child: Text('Logout',
-                            style:
-                                const TextStyle(fontWeight: FontWeight.w600))),
+                        backgroundButtonColor: const Color.fromARGB(255, 192, 39, 29),
+                        child: Text('Logout', style: const TextStyle(fontWeight: FontWeight.w600))),
 
                     const SizedBox(height: 20),
 
@@ -251,25 +210,19 @@ class _SettingsPageDesktopState extends State<SettingsPageDesktop> {
                           showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                     backgroundColor: receiveDarkMode(false),
                                     content: Text(
                                       'Sei sicuro di voler inoltrare una richiesta di eliminazione dell\'account? L\'operazione non sarà reversibile e tutte le password verranno eliminate!',
                                       style: TextStyle(
-                                          color: receiveDarkMode(true),
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600),
+                                          color: receiveDarkMode(true), fontSize: 18, fontWeight: FontWeight.w600),
                                     ),
                                     actions: [
                                       TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
+                                          onPressed: () => Navigator.pop(context),
                                           child: Text(
                                             'Annulla',
-                                            style: TextStyle(
-                                                color: receiveDarkMode(true)),
+                                            style: TextStyle(color: receiveDarkMode(true)),
                                           )),
                                       TextButton(
                                           onPressed: () {},
@@ -280,11 +233,8 @@ class _SettingsPageDesktopState extends State<SettingsPageDesktop> {
                                     ],
                                   ));
                         },
-                        backgroundButtonColor:
-                            const Color.fromARGB(255, 192, 39, 29),
-                        child: Text('Elimina account',
-                            style:
-                                const TextStyle(fontWeight: FontWeight.w600))),
+                        backgroundButtonColor: const Color.fromARGB(255, 192, 39, 29),
+                        child: Text('Elimina account', style: const TextStyle(fontWeight: FontWeight.w600))),
                   ],
                 ),
               ),

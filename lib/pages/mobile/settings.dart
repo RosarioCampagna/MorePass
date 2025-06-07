@@ -23,8 +23,7 @@ class SettingsPageMobile extends StatefulWidget {
 
 class _SettingsPageMobileState extends State<SettingsPageMobile> {
   bool isGoogleLinked() {
-    final List<UserIdentity> identities =
-        Supabase.instance.client.auth.currentUser!.identities!;
+    final List<UserIdentity> identities = Supabase.instance.client.auth.currentUser!.identities!;
 
     for (UserIdentity identity in identities) {
       if (identity.provider == 'google') {
@@ -57,16 +56,15 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
               icon: Icons.home_outlined,
               selected: false,
               label: 'Home',
-              onTap: () => Navigator.pushAndRemoveUntil(context,
-                  slideRightNavigator(const AUthGate()), (_) => false)),
+              onTap: () => Navigator.pushAndRemoveUntil(context, slideRightNavigator(const AUthGate()), (_) => false)),
 
           //parte del bottom nav bar che reindirizza alla pagina delle password
           NavbarComponent(
               icon: Icons.key_outlined,
               selected: false,
               label: 'Vault',
-              onTap: () => Navigator.pushAndRemoveUntil(context,
-                  slideRightNavigator(const PasswordList()), (_) => false)),
+              onTap: () =>
+                  Navigator.pushAndRemoveUntil(context, slideRightNavigator(const PasswordList()), (_) => false)),
 
           //parte del bottom nav bar che reindirizza alla generazione di una password
           NavbarComponent(
@@ -74,9 +72,7 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
               selected: false,
               label: 'Genera',
               onTap: () => Navigator.pushAndRemoveUntil(
-                  context,
-                  slideRightNavigator(const PasswordGeneratorPage()),
-                  (_) => false)),
+                  context, slideRightNavigator(const PasswordGeneratorPage()), (_) => false)),
 
           //parte del bottom nav bar che reindirizza alle impostazioni
           NavbarComponent(
@@ -104,8 +100,7 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
               //tile for the username
               SettingsTile(
                 title: 'Username',
-                subtitle: Supabase
-                    .instance.client.auth.currentUser!.userMetadata!.entries
+                subtitle: Supabase.instance.client.auth.currentUser!.userMetadata!.entries
                     .firstWhere((value) => value.key == 'displayName')
                     .value,
                 icon: Icons.person_rounded,
@@ -116,16 +111,13 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
                       showDialog(
                           context: context,
                           builder: (context) {
-                            final TextEditingController newUsernameController =
-                                TextEditingController();
+                            final TextEditingController newUsernameController = TextEditingController();
 
-                            final GlobalKey<FormState> formKey =
-                                GlobalKey<FormState>();
+                            final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
                             return AlertDialog(
                               backgroundColor: receiveDarkMode(false),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               content: Form(
                                   key: formKey,
                                   child: SizedBox(
@@ -144,22 +136,19 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
                                     onPressed: () => Navigator.pop(context),
                                     child: Text(
                                       'Annulla',
-                                      style: TextStyle(
-                                          color: receiveDarkMode(true)),
+                                      style: TextStyle(color: receiveDarkMode(true)),
                                     )),
 
                                 //tasto per confermare
                                 TextButton(
                                     onPressed: () async {
                                       if (formKey.currentState!.validate()) {
-                                        await SupaBase().updateUsername(
-                                            newUsernameController.text);
+                                        await SupaBase().updateUsername(newUsernameController.text);
                                         setState(() {});
                                         Navigator.pop(context);
                                       }
                                     },
-                                    child: Text('Conferma',
-                                        style: TextStyle(color: primary))),
+                                    child: Text('Conferma', style: TextStyle(color: primary))),
                               ],
                             );
                           });
@@ -169,10 +158,8 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
 
               //tasto che reindirizza alla scelta del tema
               CustomButton(
-                  onPressed: () =>
-                      Navigator.pushNamed(context, '/themeChoosing'),
-                  child: Text('Cambia il tema dell\'app',
-                      style: const TextStyle(fontWeight: FontWeight.w600))),
+                  onPressed: () => Navigator.pushNamed(context, '/themeChoosing'),
+                  child: Text('Cambia il tema dell\'app', style: const TextStyle(fontWeight: FontWeight.w600))),
 
               const Spacer(),
 
@@ -183,28 +170,22 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
                       Expanded(
                         child: CustomButton(
                             onPressed: () async {
-                              await Supabase.instance.client.auth
-                                  .linkIdentity(OAuthProvider.google);
+                              await Supabase.instance.client.auth.linkIdentity(OAuthProvider.google);
                             },
                             backgroundButtonColor: Colors.red.shade400,
-                            child: Text('Collega account Google',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600))),
+                            child: Text('Collega account Google', style: const TextStyle(fontWeight: FontWeight.w600))),
                       )
                     else
                       Expanded(
                         child: CustomButton(
                             onPressed: () async {
-                              await Supabase.instance.client.auth
-                                  .unlinkIdentity(Supabase.instance.client.auth
-                                      .currentUser!.identities!
-                                      .firstWhere((identity) =>
-                                          identity.provider == 'google'));
+                              await Supabase.instance.client.auth.unlinkIdentity(Supabase
+                                  .instance.client.auth.currentUser!.identities!
+                                  .firstWhere((identity) => identity.provider == 'google'));
                             },
                             backgroundButtonColor: Colors.red.shade400,
-                            child: Text('Scollega account Google',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600))),
+                            child:
+                                Text('Scollega account Google', style: const TextStyle(fontWeight: FontWeight.w600))),
                       ),
                 ],
               ),
@@ -215,14 +196,10 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
               CustomButton(
                   onPressed: () {
                     SupaBase().signOut();
-                    Navigator.pushAndRemoveUntil(
-                        context,
-                        slideLeftNavigator(const AUthGate()),
-                        (predicate) => false);
+                    Navigator.pushAndRemoveUntil(context, slideLeftNavigator(const AUthGate()), (predicate) => false);
                   },
                   backgroundButtonColor: const Color.fromARGB(255, 192, 39, 29),
-                  child: Text('Logout',
-                      style: const TextStyle(fontWeight: FontWeight.w600))),
+                  child: Text('Logout', style: const TextStyle(fontWeight: FontWeight.w600))),
 
               const SizedBox(height: 20),
 
@@ -232,23 +209,19 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               backgroundColor: receiveDarkMode(false),
                               content: Text(
                                 'Sei sicuro di voler inoltrare una richiesta di eliminazione dell\'account? L\'operazione non sarà reversibile e tutte le password verranno eliminate!',
-                                style: TextStyle(
-                                    color: receiveDarkMode(true),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600),
+                                style:
+                                    TextStyle(color: receiveDarkMode(true), fontSize: 18, fontWeight: FontWeight.w600),
                               ),
                               actions: [
                                 TextButton(
                                     onPressed: () => Navigator.pop(context),
                                     child: Text(
                                       'Annulla',
-                                      style: TextStyle(
-                                          color: receiveDarkMode(true)),
+                                      style: TextStyle(color: receiveDarkMode(true)),
                                     )),
                                 TextButton(
                                     onPressed: () {},
@@ -260,8 +233,7 @@ class _SettingsPageMobileState extends State<SettingsPageMobile> {
                             ));
                   },
                   backgroundButtonColor: const Color.fromARGB(255, 192, 39, 29),
-                  child: Text('Elimina account',
-                      style: const TextStyle(fontWeight: FontWeight.w600))),
+                  child: Text('Elimina account', style: const TextStyle(fontWeight: FontWeight.w600))),
             ],
           ),
         ),

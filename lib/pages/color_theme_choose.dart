@@ -53,8 +53,7 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
                 primary = oldPrimary!;
                 darkMode = oldDarkMode!;
               },
-              icon: Icon(Icons.arrow_back_ios_new_rounded,
-                  color: darkMode ? secondaryLight : secondaryDark)),
+              icon: Icon(Icons.arrow_back_ios_new_rounded, color: darkMode ? secondaryLight : secondaryDark)),
           title: Text(
             'Scegli il tuo tema',
             style: TextStyle(color: darkMode ? secondaryLight : secondaryDark),
@@ -85,8 +84,8 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
                 width: 1000,
                 child: CustomButton(
                     onPressed: () {},
-                    child: Text('Questo è un tasto con questo tema',
-                        style: const TextStyle(fontWeight: FontWeight.w600))),
+                    child:
+                        Text('Questo è un tasto con questo tema', style: const TextStyle(fontWeight: FontWeight.w600))),
               ),
 
               const SizedBox(height: 20),
@@ -259,61 +258,51 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
                       await setColor();
                       await setDarkMode();
 
-                      if (ModalRoute.of(context)!.settings.name ==
-                          '/themeChoosing') {
+                      if (ModalRoute.of(context)!.settings.name == '/themeChoosing') {
                         //mostra un dialog con le informazioni necessarie
                         showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
                                   backgroundColor: receiveDarkMode(false),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       CircularProgressIndicator(color: primary),
                                       const SizedBox(height: 10),
-                                      Text(
-                                          'Per rendere effettivo il cambiamento rieffettua il login',
-                                          style: TextStyle(
-                                              color: receiveDarkMode(true)))
+                                      Text('Per rendere effettivo il cambiamento rieffettua il login',
+                                          style: TextStyle(color: receiveDarkMode(true)))
                                     ],
                                   ),
                                 ));
                       }
 
                       //fa sparire il caricamento dopo un tot di secondi
-                      Future.delayed(const Duration(seconds: 3))
-                          .then((onValue) async {
+                      Future.delayed(const Duration(seconds: 3)).then((onValue) async {
                         Navigator.pop(context);
 
                         //mostra un messaggio che dice che il tema è aggiornato
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             content: Text('Tema aggiornato con successo')));
 
                         //controlla che non sia la prima volta che si effettua il login
-                        if ((await SupaBase().getFirstTime()).first['first'] ==
-                            true) {
+                        if ((await SupaBase().getFirstTime()).first['first'] == true) {
                           SupaBase().updateFirstTime();
                         }
 
-                        //se la route non è /authGate allora ritorna a questa pagina
-                        if (ModalRoute.of(context)!.settings.name ==
-                            '/themeChoosing') {
+                        //se la route non è /themeChoosing allora ritorna a questa pagina
+                        if (ModalRoute.of(context)!.settings.name == '/themeChoosing') {
                           //effettua il logout
                           SupaBase().signOut();
 
                           //riporta alla pagina di login
-                          Navigator.pushAndRemoveUntil(context,
-                              slideLeftNavigator(AUthGate()), (_) => false);
+                          Navigator.pushAndRemoveUntil(context, slideLeftNavigator(AUthGate()), (_) => false);
                         }
                       });
                     },
-                    child: Text('Conferma',
-                        style: const TextStyle(fontWeight: FontWeight.w600))),
+                    child: Text('Conferma', style: const TextStyle(fontWeight: FontWeight.w600))),
               )
             ],
           ),
