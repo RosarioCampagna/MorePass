@@ -7,7 +7,7 @@ import 'package:morepass/components/colors.dart';
 import 'package:morepass/components/custom_components/custom_button.dart';
 import 'package:morepass/components/custom_components/textfield.dart';
 import 'package:morepass/components/route_builder.dart';
-import 'package:morepass/cypher/master_password_notifier.dart';
+import 'package:morepass/master_password_mangement/master_password_notifier.dart';
 import 'package:morepass/pages/email_confirmation.dart';
 import 'package:morepass/pages/recovery_page.dart';
 import 'package:provider/provider.dart';
@@ -88,10 +88,9 @@ class _LoginPageState extends State<LoginPage> {
                             if (_formKey.currentState!.validate()) {
                               //controlla se l'utente ha inserito una master password
                               String? masterPassword = masterPasswordNotifier.masterPassword;
-                              print(masterPassword);
 
                               //se non l'ha inserita mostra un dialog di inserimento
-                              /*  if (masterPassword == null) {
+                              if (masterPassword == null) {
                                 showDialog(
                                     context: context,
                                     builder: (context) {
@@ -134,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                                                   //conserva la password
                                                   await masterPasswordNotifier
                                                       .setMasterPassword(passwordControllerDialog.text);
-                                                  Navigator.pop(context);
+
                                                   //effettua il login con email e password
                                                   await SupaBase().signInWithEmailPassword(
                                                       _passwordController.text, _emailController.text);
@@ -148,30 +147,30 @@ class _LoginPageState extends State<LoginPage> {
                                         ],
                                       );
                                     });
-                              } else { */
-                              try {
-                                //effettua il login con email e password
-                                await SupaBase()
-                                    .signInWithEmailPassword(_passwordController.text, _emailController.text);
+                              } else {
+                                try {
+                                  //effettua il login con email e password
+                                  await SupaBase()
+                                      .signInWithEmailPassword(_passwordController.text, _emailController.text);
 
-                                //setta il tema
-                                await setColor();
-                                await setDarkMode();
-                              } catch (e) {
-                                if (e.toString().contains('email_not_confirmed')) {
-                                  SupaBase().sendEmailConfirmation(_emailController.text);
-                                  slideUpperNavigatorDialog(EmailConfirmation(), context);
-                                }
+                                  //setta il tema
+                                  await setColor();
+                                  await setDarkMode();
+                                } catch (e) {
+                                  if (e.toString().contains('email_not_confirmed')) {
+                                    SupaBase().sendEmailConfirmation(_emailController.text);
+                                    slideUpperNavigatorDialog(EmailConfirmation(), context);
+                                  }
 
-                                //in caso di errore mostra il messaggio
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                      behavior: SnackBarBehavior.floating,
-                                      content: Text(e.toString())));
+                                  //in caso di errore mostra il messaggio
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                        behavior: SnackBarBehavior.floating,
+                                        content: Text(e.toString())));
+                                  }
                                 }
                               }
-                              //}
                             }
                           },
                           child: Text('Accedi', style: const TextStyle(fontWeight: FontWeight.w600))),

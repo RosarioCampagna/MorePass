@@ -43,6 +43,7 @@ dependencies:
   pointycastle: ^3.9.1
   flutter_secure_storage: ^4.2.1
   provider: ^6.1.5
+  web: ^1.1.1
 
 # Line to create splash screen
 flutter_native_splash:

@@ -22,9 +22,8 @@ class Homepage extends StatelessWidget {
   const Homepage({super.key});
 
   IconData setIcon(String category) {
-    const IconData globe = IconData(0xf68d,
-        fontFamily: CupertinoIcons.iconFont,
-        fontPackage: CupertinoIcons.iconFontPackage);
+    const IconData globe =
+        IconData(0xf68d, fontFamily: CupertinoIcons.iconFont, fontPackage: CupertinoIcons.iconFontPackage);
     switch (category) {
       case 'Login':
         return globe;
@@ -91,34 +90,29 @@ class Homepage extends StatelessWidget {
           bottomNavigationBar: NavBar(
             items: [
               //parte del bottom nav bar che reindirizza alla home
-              NavbarComponent(
-                  icon: Icons.home_rounded, selected: true, label: 'Home'),
+              NavbarComponent(icon: Icons.home_rounded, selected: true, label: 'Home'),
 
               //parte del bottom nav bar che reindirizza alla pagina delle password
               NavbarComponent(
                   icon: Icons.key_outlined,
                   selected: false,
                   label: 'Vault',
-                  onTap: () => Navigator.pushAndRemoveUntil(context,
-                      slideLeftNavigator(PasswordList()), (_) => false)),
+                  onTap: () => Navigator.pushAndRemoveUntil(context, slideLeftNavigator(PasswordList()), (_) => false)),
 
               //parte del bottom nav bar che reindirizza alla generazione di una password
               NavbarComponent(
                   icon: Icons.refresh_rounded,
                   selected: false,
                   label: 'Genera',
-                  onTap: () => Navigator.pushAndRemoveUntil(
-                      context,
-                      slideLeftNavigator(PasswordGeneratorPage()),
-                      (_) => false)),
+                  onTap: () =>
+                      Navigator.pushAndRemoveUntil(context, slideLeftNavigator(PasswordGeneratorPage()), (_) => false)),
 
               //parte del bottom nav bar che reindirizza alle impostazioni
               NavbarComponent(
                   icon: Icons.person_outline_rounded,
                   selected: false,
                   label: 'Impostazioni',
-                  onTap: () => Navigator.pushAndRemoveUntil(context,
-                      slideLeftNavigator(SettingsPage()), (_) => false)),
+                  onTap: () => Navigator.pushAndRemoveUntil(context, slideLeftNavigator(SettingsPage()), (_) => false)),
             ],
           ),
           body: Container(
@@ -136,19 +130,13 @@ class Homepage extends StatelessWidget {
                     text: TextSpan(children: [
                       TextSpan(
                           text: 'Bentornato, ',
-                          style: TextStyle(
-                              color: receiveDarkMode(true),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400)),
+                          style: TextStyle(color: receiveDarkMode(true), fontSize: 16, fontWeight: FontWeight.w400)),
 
                       //nome utente
                       TextSpan(
                           text:
                               '${Supabase.instance.client.auth.currentUser!.userMetadata!.entries.firstWhere((element) => element.key == 'displayName').value}',
-                          style: TextStyle(
-                              color: receiveDarkMode(true),
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600))
+                          style: TextStyle(color: receiveDarkMode(true), fontSize: 24, fontWeight: FontWeight.w600))
                     ]),
                   ),
                   Text(
@@ -157,10 +145,7 @@ class Homepage extends StatelessWidget {
                     overflow: TextOverflow.visible,
                     softWrap: true,
                     textAlign: TextAlign.start,
-                    style: TextStyle(
-                        fontSize: 16,
-                        overflow: TextOverflow.visible,
-                        color: Colors.grey.shade600),
+                    style: TextStyle(fontSize: 16, overflow: TextOverflow.visible, color: Colors.grey.shade600),
                   ),
 
                   const SizedBox(height: 10),
@@ -172,27 +157,21 @@ class Homepage extends StatelessWidget {
                       padding: const EdgeInsets.all(10),
                       margin: const EdgeInsets.only(top: 5),
                       width: 1000,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           //Icona del container
                           Container(
                               padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                  color:
-                                      const Color.fromARGB(45, 255, 255, 255),
-                                  shape: BoxShape.circle),
+                              decoration:
+                                  BoxDecoration(color: const Color.fromARGB(45, 255, 255, 255), shape: BoxShape.circle),
                               child: Container(
                                 padding: const EdgeInsets.all(3),
                                 decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: Colors.grey.shade100,
-                                        width: 1.5),
+                                    border: Border.all(color: Colors.grey.shade100, width: 1.5),
                                     shape: BoxShape.circle),
-                                child: Icon(Icons.person_outline_rounded,
-                                    color: Colors.grey.shade100),
+                                child: Icon(Icons.person_outline_rounded, color: Colors.grey.shade100),
                               )),
 
                           const SizedBox(height: 10),
@@ -200,31 +179,23 @@ class Homepage extends StatelessWidget {
                           //intestazione
                           Text(
                             'Nuove password',
-                            style: TextStyle(
-                                color: Colors.grey.shade100,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w600),
+                            style: TextStyle(color: Colors.grey.shade100, fontSize: 18, fontWeight: FontWeight.w600),
                           ),
 
                           //Sottotitolo
                           Text(
                             'Aggiungi le tue password con facilità',
-                            style: TextStyle(
-                                color: Colors.grey.shade300,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400),
+                            style: TextStyle(color: Colors.grey.shade300, fontSize: 14, fontWeight: FontWeight.w400),
                           ),
 
                           const SizedBox(height: 20),
 
                           //tasto per aggiungere una password
                           CustomButton(
-                              onPressed: () => slideUpperNavigatorDialog(
-                                  PasswordManagement(), context),
+                              onPressed: () => slideUpperNavigatorDialog(PasswordManagement(), context),
                               backgroundButtonColor: Colors.grey.shade100,
-                              child: Text('Aggiungi nuova password',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w600)))
+                              child:
+                                  Text('Aggiungi nuova password', style: const TextStyle(fontWeight: FontWeight.w600)))
                         ],
                       ),
                     ),
@@ -236,10 +207,8 @@ class Homepage extends StatelessWidget {
                   StreamBuilder(
                       stream: SupaBase().getSearchedPasswords('passwords', ''),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                              child: CircularProgressIndicator(color: primary));
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator(color: primary));
                         }
                         if (snapshot.hasError) {
                           return Center(
@@ -251,8 +220,7 @@ class Homepage extends StatelessWidget {
 
                         List<Passwords> passwords = snapshot.data!;
 
-                        passwords
-                            .sort((a, b) => b.creato!.compareTo(a.creato!));
+                        passwords.sort((a, b) => b.creato!.compareTo(a.creato!));
 
                         List<Passwords> last5pass;
                         int endList = 5;
@@ -285,9 +253,7 @@ class Homepage extends StatelessWidget {
                                   //tile del totale delle password salvate
                                   HomepageTile(
                                       onTap: () => Navigator.pushAndRemoveUntil(
-                                          context,
-                                          slideRightNavigator(PasswordList()),
-                                          (_) => false),
+                                          context, slideRightNavigator(PasswordList()), (_) => false),
                                       icon: Icons.key_rounded,
                                       passwordCategory: 'Password salvate',
                                       passwordNumber: passwords.length),
@@ -296,32 +262,24 @@ class Homepage extends StatelessWidget {
                                   //per ogni categoria presente crea un tile della categoria
                                   for (var category in passCategories)
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 2.5),
+                                      padding: const EdgeInsets.symmetric(horizontal: 2.5),
                                       child: HomepageTile(
                                           //reindirizza alla categoria selezionata
-                                          onTap: () =>
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  slideRightNavigator(
-                                                      PasswordList(
-                                                          category: Encryption()
-                                                              .decryptData(
-                                                                  category))),
-                                                  (_) => false),
+                                          onTap: () => Navigator.pushAndRemoveUntil(
+                                              context,
+                                              slideRightNavigator(
+                                                  PasswordList(category: Encryption().decryptData(category))),
+                                              (_) => false),
 
                                           //titolo della categoria
-                                          passwordCategory: Encryption()
-                                              .decryptData(category),
+                                          passwordCategory: Encryption().decryptData(category),
 
                                           //numero di password presenti in categoria
                                           passwordNumber: passwords
-                                              .where((password) =>
-                                                  password.category == category)
+                                              .where((password) => password.category == category)
                                               .toList()
                                               .length,
-                                          icon: setIcon(Encryption()
-                                              .decryptData(category))),
+                                          icon: setIcon(Encryption().decryptData(category))),
                                     )
                                 ],
                               ),
@@ -335,9 +293,7 @@ class Homepage extends StatelessWidget {
                                 Text(
                                   'Ultime password salvate',
                                   style: TextStyle(
-                                      color: receiveDarkMode(true),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600),
+                                      color: receiveDarkMode(true), fontSize: 16, fontWeight: FontWeight.w600),
                                 )
                               ],
                             ),
@@ -353,39 +309,27 @@ class Homepage extends StatelessWidget {
                                   itemCount: last5pass.length,
                                   physics: NeverScrollableScrollPhysics(),
                                   itemBuilder: (context, passwordsIndex) {
-                                    Passwords password =
-                                        last5pass[passwordsIndex];
+                                    Passwords password = last5pass[passwordsIndex];
 
                                     final decryptedPassword = Passwords(
                                         id: password.id,
-                                        provider: Encryption()
-                                            .decryptData(password.provider),
-                                        username: Encryption()
-                                            .decryptData(password.username),
-                                        password: Encryption()
-                                            .decryptData(password.password),
-                                        notes: Encryption()
-                                            .decryptData(password.notes),
-                                        category: Encryption()
-                                            .decryptData(password.category),
+                                        provider: Encryption().decryptData(password.provider),
+                                        username: Encryption().decryptData(password.username),
+                                        password: Encryption().decryptData(password.password),
+                                        notes: Encryption().decryptData(password.notes),
+                                        category: Encryption().decryptData(password.category),
                                         creato: password.creato);
 
                                     return CustomListTile(
                                         password: decryptedPassword,
-                                        onTilePress: () =>
-                                            slideUpperNavigatorDialog(
-                                                PasswordDetails(
-                                                    password:
-                                                        decryptedPassword),
-                                                context));
+                                        onTilePress: () => slideUpperNavigatorDialog(
+                                            PasswordDetails(password: decryptedPassword), context));
                                   })
                             else
                               Text(
                                 'Nessuna password salvata',
-                                style: TextStyle(
-                                    color: receiveDarkMode(true),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600),
+                                style:
+                                    TextStyle(color: receiveDarkMode(true), fontSize: 18, fontWeight: FontWeight.w600),
                               )
                           ],
                         );

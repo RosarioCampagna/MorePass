@@ -10,7 +10,7 @@ import 'package:morepass/components/desktop_navigator.dart';
 import 'package:morepass/components/custom_components/textfield.dart';
 import 'package:morepass/components/page_setter/password_generator_page.dart';
 import 'package:morepass/components/page_setter/settings_page.dart';
-import 'package:morepass/cypher/master_password_notifier.dart';
+import 'package:morepass/master_password_mangement/master_password_notifier.dart';
 import 'package:morepass/pages/password_details.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -97,8 +97,6 @@ class _PasswordListDesktopState extends State<PasswordListDesktop> {
 
   @override
   Widget build(BuildContext context) {
-    /* final masterPasswordNotifier = Provider.of<MasterPasswordNotifier>(context);
-    print(masterPasswordNotifier.masterPassword); */
     return Scaffold(
         backgroundColor: receiveDarkMode(false),
         //tasto per aggiungere password
