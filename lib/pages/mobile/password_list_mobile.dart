@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:morepass/apis/apis.dart';
-import 'package:morepass/apis/encryption.dart';
+import 'package:morepass/cypher/encryption.dart';
 import 'package:morepass/apis/password.dart';
 import 'package:morepass/components/page_setter/auth_gate.dart';
 import 'package:morepass/components/colors.dart';

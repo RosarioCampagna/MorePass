@@ -13,7 +13,7 @@ import 'package:morepass/pages/password_details.dart';
 import 'package:morepass/pages/password_management.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../apis/encryption.dart';
+import '../../cypher/encryption.dart';
 import '../../components/navbar/navbar.dart';
 import '../../components/navbar/navbar_component.dart';
 import '../../components/route_builder.dart';

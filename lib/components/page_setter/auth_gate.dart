@@ -31,9 +31,7 @@ class AUthGate extends StatelessWidget {
                         return CircularProgressIndicator(color: primary);
                       }
 
-                      final user = snapshot.data!.firstWhere((value) =>
-                          value.uid ==
-                          Supabase.instance.client.auth.currentUser!.id);
+                      final user = snapshot.data!;
 
                       return user.first
                           ? const ColorThemeChoosePage()
