@@ -104,7 +104,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       leadingIcon: Icons.key_rounded,
                       visible: true,
                       onChanged: () => setState(() {}),
-                      hint: 'Inserisci password',
+                      hint: 'Conferma password',
                       error: "Inserisci una password valida",
                       filled: false),
                 ),
@@ -124,16 +124,16 @@ class _RegisterPageState extends State<RegisterPage> {
                         PswManagerStrength(
                             icon: Icons.abc_rounded,
                             contained: _passwordController.text.includesUpper() ||
-                                _passwordConfirmController.text.includesLower(),
+                                _passwordConfirmController.text.includesUpper(),
                             text: 'Lettere maiuscole'),
                         PswManagerStrength(
                             icon: Icons.numbers_rounded,
-                            contained: _passwordController.text.includesNum() ||
-                                _passwordConfirmController.text.includesLower(),
+                            contained:
+                                _passwordController.text.includesNum() || _passwordConfirmController.text.includesNum(),
                             text: 'Numeri'),
                         PswManagerStrength(
-                            contained: _passwordController.text.includesSym() ||
-                                _passwordConfirmController.text.includesLower(),
+                            contained:
+                                _passwordController.text.includesSym() || _passwordConfirmController.text.includesSym(),
                             text: 'Simboli',
                             icon: Icons.emoji_symbols_rounded),
                         PswManagerStrength(
@@ -142,6 +142,20 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ? 'Le password coincidono'
                                 : 'Le password non coincidono',
                             icon: _passwordController.text == _passwordConfirmController.text
+                                ? Icons.check_rounded
+                                : Icons.close_rounded),
+                        PswManagerStrength(
+                            contained: _passwordController.text.meetsPasswordRequirement(true, true, true, true) &&
+                                (isStrong(_passwordController.text) == 'Very strong' ||
+                                    isStrong(_passwordController.text) == 'Strong'),
+                            text: _passwordController.text.meetsPasswordRequirement(true, true, true, true) &&
+                                    (isStrong(_passwordController.text) == 'Very strong' ||
+                                        isStrong(_passwordController.text) == 'Strong')
+                                ? 'Ottima password, rispetta tutti i requisiti'
+                                : 'La password è troppo debole',
+                            icon: _passwordController.text.meetsPasswordRequirement(true, true, true, true) &&
+                                    (isStrong(_passwordController.text) == 'Very strong' ||
+                                        isStrong(_passwordController.text) == 'Strong')
                                 ? Icons.check_rounded
                                 : Icons.close_rounded)
                       ],
@@ -156,7 +170,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           if (_passwordController.text == _passwordConfirmController.text &&
-                              _passwordController.text.meetsPasswordRequirement(true, true, true, true)) {
+                              _passwordController.text.meetsPasswordRequirement(true, true, true, true) &&
+                              (isStrong(_passwordController.text) == 'Very strong' ||
+                                  isStrong(_passwordController.text) == 'Strong')) {
                             //crea l'utente
                             try {
                               await SupaBase().signUpNewUser(
@@ -177,7 +193,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                         'Controlla la tua casella di posta elettronica per verificare il tuo account')));
                               }
 
-                              slideUpperNavigatorDialog(EmailConfirmation(), context);
+                              slideUpperNavigatorDialog(
+                                  EmailConfirmation(
+                                    email: _emailController.text,
+                                  ),
+                                  context);
                             }
                           }
                         }

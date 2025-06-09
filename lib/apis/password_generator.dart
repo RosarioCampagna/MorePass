@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 //genera una password casuale di lunghezza specificata
 //passa le variabili per conoscere la natura della password generata
-String generatePassword(int passwordLength, bool excDuplicate, bool includeSym,
-    bool includeLow, bool includeUp, bool includeNum) {
+String generatePassword(
+    int passwordLength, bool excDuplicate, bool includeSym, bool includeLow, bool includeUp, bool includeNum) {
   late String tempPassword;
   String randomPass = '';
 
@@ -63,10 +63,8 @@ String generatePassword(int passwordLength, bool excDuplicate, bool includeSym,
   }
 
   //se la password generata non rispetta i requisiti richiama la funzione
-  if (!randomPass.meetsPasswordRequirement(
-      includeSym, includeLow, includeUp, includeNum)) {
-    return generatePassword(passwordLength, excDuplicate, includeSym,
-        includeLow, includeUp, includeNum);
+  if (!randomPass.meetsPasswordRequirement(includeSym, includeLow, includeUp, includeNum)) {
+    return generatePassword(passwordLength, excDuplicate, includeSym, includeLow, includeUp, includeNum);
   }
 
   //ritorna la password generata
@@ -76,13 +74,12 @@ String generatePassword(int passwordLength, bool excDuplicate, bool includeSym,
 //controlla se la password è una password forte
 String isStrong(String psw) {
   //se la password rispetta tutti i requisiti con lunghezza superiore a 10 caratteri
-  if (psw.meetsPasswordRequirement(true, true, true, true) &&
-      psw.length >= 10) {
+  if (psw.meetsPasswordRequirement(true, true, true, true) && psw.length >= 10) {
     return 'Very strong';
   }
 
   //se la password rispetta tutti i requisiti con lunghezza inferiore a 10 caratteri
-  if (psw.meetsPasswordRequirement(true, true, true, true) && psw.length < 10) {
+  if (psw.meetsPasswordRequirement(true, true, true, true) && psw.length >= 8) {
     return 'Strong';
   }
 
@@ -111,8 +108,7 @@ String isStrong(String psw) {
 //estendi la classe string validator sulla classe Stringa
 extension StringValidators on String {
   //controlla se la password risetta i requisiti richiesti
-  bool meetsPasswordRequirement(
-      bool includeSym, bool includeLow, bool includeUp, bool includeNum) {
+  bool meetsPasswordRequirement(bool includeSym, bool includeLow, bool includeUp, bool includeNum) {
     //imosta un pattern iniziale
     String pattern = r'^';
 

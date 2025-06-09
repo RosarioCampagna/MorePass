@@ -86,79 +86,28 @@ class _LoginPageState extends State<LoginPage> {
                       child: CustomButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    final TextEditingController passwordControllerDialog = TextEditingController();
-                                    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+                              try {
+                                //effettua il login con email e password
+                                await SupaBase()
+                                    .signInWithEmailPassword(_passwordController.text, _emailController.text);
 
-                                    return AlertDialog(
-                                      backgroundColor: receiveDarkMode(false),
+                                //setta il tema
+                                await setColor();
+                                await setDarkMode();
+                              } catch (e) {
+                                if (e.toString().contains('email_not_confirmed')) {
+                                  SupaBase().sendEmailConfirmation(_emailController.text);
+                                  slideUpperNavigatorDialog(EmailConfirmation(email: _emailController.text,), context);
+                                }
+
+                                //in caso di errore mostra il messaggio
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                      title: Text(
-                                        'Questa password serve per decifrare il tuo database. \nMettila al sicuro, senza non potrai accedervi.',
-                                        style: TextStyle(color: receiveDarkMode(true), fontSize: 18),
-                                      ),
-                                      content: Form(
-                                          key: formKey,
-                                          child: SizedBox(
-                                            width: 500,
-                                            child: CustomTextField(
-                                                controller: passwordControllerDialog,
-                                                leadingIcon: Icons.email_rounded,
-                                                hint: "Inserisci una password",
-                                                error: 'Inserisci una password valida',
-                                                filled: false),
-                                          )),
-                                      actions: [
-                                        //tasto per annullare
-                                        TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text(
-                                              'Annulla',
-                                              style: TextStyle(color: receiveDarkMode(true)),
-                                            )),
-
-                                        //tasto per conservare la password
-                                        TextButton(
-                                            onPressed: () async {
-                                              if (formKey.currentState!.validate()) {
-                                                //conserva la password
-                                                await masterPasswordNotifier
-                                                    .setMasterPassword(passwordControllerDialog.text);
-                                                Navigator.pop(context);
-
-                                                try {
-                                                  //effettua il login con email e password
-                                                  await SupaBase().signInWithEmailPassword(
-                                                      _passwordController.text, _emailController.text);
-
-                                                  //setta il tema
-                                                  await setColor();
-                                                  await setDarkMode();
-                                                } catch (e) {
-                                                  if (e.toString().contains('email_not_confirmed')) {
-                                                    SupaBase().sendEmailConfirmation(_emailController.text);
-                                                    slideUpperNavigatorDialog(EmailConfirmation(), context);
-                                                  }
-
-                                                  //in caso di errore mostra il messaggio
-                                                  if (mounted) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(12)),
-                                                        behavior: SnackBarBehavior.floating,
-                                                        content: Text(e.toString())));
-                                                  }
-                                                }
-                                              }
-                                            },
-                                            child: Text('Salva', style: TextStyle(color: primary)))
-                                      ],
-                                    );
-                                  });
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text(e.toString())));
+                                }
+                              }
                             }
                           },
                           child: Text('Accedi', style: const TextStyle(fontWeight: FontWeight.w600))),

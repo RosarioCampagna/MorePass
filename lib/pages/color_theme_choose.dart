@@ -9,6 +9,8 @@ import 'package:morepass/components/custom_components/custom_button.dart';
 import 'package:morepass/components/custom_components/custom_list_tile.dart';
 import 'package:morepass/components/custom_components/settings_tile.dart';
 import 'package:morepass/components/custom_components/textfield.dart';
+import 'package:morepass/master_password_mangement/master_password_notifier.dart';
+import 'package:provider/provider.dart';
 
 import '../components/colors.dart';
 import '../components/route_builder.dart';
@@ -258,6 +260,11 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
                       await setColor();
                       await setDarkMode();
 
+                      //controlla che non sia la prima volta che si effettua il login
+                      if ((await SupaBase().getFirstTime()).first['first'] == true) {
+                        SupaBase().updateFirstTime();
+                      }
+
                       if (ModalRoute.of(context)!.settings.name == '/themeChoosing') {
                         //mostra un dialog con le informazioni necessarie
                         showDialog(
@@ -287,18 +294,15 @@ class _ColorThemeChoosePageState extends State<ColorThemeChoosePage> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             content: Text('Tema aggiornato con successo')));
 
-                        //controlla che non sia la prima volta che si effettua il login
-                        if ((await SupaBase().getFirstTime()).first['first'] == true) {
-                          SupaBase().updateFirstTime();
-                        }
-
                         //se la route non è /themeChoosing allora ritorna a questa pagina
                         if (ModalRoute.of(context)!.settings.name == '/themeChoosing') {
-                          //effettua il logout
-                          SupaBase().signOut();
-
                           //riporta alla pagina di login
                           Navigator.pushAndRemoveUntil(context, slideLeftNavigator(AUthGate()), (_) => false);
+
+                          Provider.of<MasterPasswordNotifier>(context, listen: false).deleteMasterPassword();
+
+                          //effettua il logout
+                          SupaBase().signOut();
                         }
                       });
                     },
