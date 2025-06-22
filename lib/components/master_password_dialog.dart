@@ -84,16 +84,6 @@ void showMasterPaswordDialog(context, MasterPasswordNotifier masterPasswordNotif
                 )),
           ),
           actions: [
-            //tasto per annullare
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text(
-                  'Annulla',
-                  style: TextStyle(color: receiveDarkMode(true)),
-                )),
-
             //tasto per conservare la password
             TextButton(
                 onPressed: () async {
