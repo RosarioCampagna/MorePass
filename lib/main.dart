@@ -8,14 +8,16 @@ import 'package:morepass/master_password_mangement/master_password_storage.dart'
 import 'package:morepass/pages/color_theme_choose.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load();
+  const String apiKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+  const String dbLink = String.fromEnvironment('SUPABASE_DB_LINK');
+
+  //await dotenv.load();
   //Supabase initilization
-  await Supabase.initialize(url: dotenv.env['SUPABASE_DB_LINK']!, anonKey: dotenv.env['SUPABASE_ANON_KEY']!);
+  await Supabase.initialize(url: dbLink, anonKey: apiKey);
 
   // 🔹 Verifica login utente + gestione errori
   if (Supabase.instance.client.auth.currentSession != null) {

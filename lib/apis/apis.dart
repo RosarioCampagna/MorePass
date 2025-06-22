@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:morepass/components/cypher/encryption.dart';
 import 'package:morepass/apis/password.dart';
@@ -175,8 +174,11 @@ class SupaBase {
 
   //accedi con google
   Future<AuthResponse> signInWithGoogle() async {
-    await dotenv.load();
-    String webClientId = dotenv.env['GOOGLE_LINK']!;
+    /* await dotenv.load();
+    dotenv.env['GOOGLE_LINK']! */
+
+    const String googleLink = String.fromEnvironment('GOOGLE_LINK');
+    String webClientId = googleLink;
 
     final GoogleSignIn googleSignIn = GoogleSignIn(
       serverClientId: webClientId,
