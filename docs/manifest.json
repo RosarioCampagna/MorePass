@@ -1,11 +1,11 @@
 {
-    "name": "Web password manager",
-    "short_name": "Web password manager",
+    "name": "MorePass",
+    "short_name": "MorePass",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "An online passowrd manager to store your passwords in a safe place.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
