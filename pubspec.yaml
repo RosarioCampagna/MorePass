@@ -53,6 +53,9 @@ flutter_native_splash:
     color: "#212c37"
     image: "assets/icon-512.png"
     icon_background_color: "#7b9095"
+  web:
+    color: "#212c37"
+    image: "assets/icon-512.png"
 
 #Line to create app icon
 icons_launcher:
