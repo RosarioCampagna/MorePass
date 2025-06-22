@@ -12,6 +12,7 @@ void showMasterPaswordDialog(context, MasterPasswordNotifier masterPasswordNotif
 
   showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         final TextEditingController passwordControllerDialog = TextEditingController();
         final GlobalKey<FormState> formKey = GlobalKey<FormState>();
