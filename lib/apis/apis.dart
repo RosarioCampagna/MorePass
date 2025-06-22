@@ -23,6 +23,11 @@ class SupaBase {
     });
   }
 
+  //conserva un log nel database
+  Future<void> _writeLog(String logDescription) async {
+    await supabase.from('log').insert({"descrizione": logDescription});
+  }
+
   //ottieni le informazioni dell'utente
   Stream<Users> getUser(String table) {
     return supabase
@@ -44,9 +49,10 @@ class SupaBase {
   }
 
   //aggiorna il tema
-  Future<void> updateTheme(String color, bool dark) async => await supabase
-      .from('preferencies')
-      .update({'color': color, 'dark': dark}).eq('uid', supabase.auth.currentUser!.id);
+  Future<void> updateTheme(String color, bool dark) async {
+    await supabase.from('preferencies').update({'color': color, 'dark': dark}).eq('uid', supabase.auth.currentUser!.id);
+    await _writeLog("Aggiornamento del tema");
+  }
 
   //controlla se in modalità scura
   Future getDarkMode() async {
@@ -59,8 +65,10 @@ class SupaBase {
   }
 
   //aggiorna il valore della prima volta a false
-  Future updateFirstTime() async =>
-      await supabase.from('preferencies').update({'first': false}).eq('uid', supabase.auth.currentUser!.id);
+  Future updateFirstTime() async {
+    await supabase.from('preferencies').update({'first': false}).eq('uid', supabase.auth.currentUser!.id);
+    await _writeLog("Primo accesso completato");
+  }
 
   //ottieni le password dal database
   Future getPasswordNumber(String table) {
@@ -87,6 +95,7 @@ class SupaBase {
         notes: EncryptionHelper().encryptData(password.notes, masterPassword, salt),
         category: EncryptionHelper().encryptData(password.category, masterPassword, salt));
     await supabase.from('passwords').insert(encryptedPassword.toJson());
+    await _writeLog("Inserimento nuova password");
   }
 
   //aggiorna una password
@@ -99,30 +108,39 @@ class SupaBase {
         category: EncryptionHelper().encryptData(newPassword.category, masterPassword, salt));
 
     await supabase.from('passwords').update(newEncryptedPassword.toJson()).eq('id', oldPassword.id!);
+
+    await _writeLog("Aggiornamento password");
   }
 
   //elimina una password
   Future<void> deletePassword(Passwords password, String table) async {
     await supabase.from(table).delete().eq('id', password.id!);
+    await _writeLog("Eliminazione password");
   }
 
   //registra un utente
   Future<AuthResponse> signUpNewUser(String password, String email, String username) async {
-    return await supabase.auth.signUp(password: password, email: email, data: {'displayName': username});
+    final user = await supabase.auth.signUp(password: password, email: email, data: {'displayName': username});
+    _writeLog("Nuova registrazione");
+    return user;
   }
 
   //effettua il login
   Future<AuthResponse> signInWithEmailPassword(String password, String email) async {
-    return await supabase.auth.signInWithPassword(password: password, email: email);
+    final user = await supabase.auth.signInWithPassword(password: password, email: email);
+    _writeLog("Nuovo accesso");
+    return user;
   }
 
   //resetta la password
   void resetPassword(String email) async {
+    _writeLog("Password reset");
     await supabase.auth.resetPasswordForEmail(email);
   }
 
   //effettua il logout
   void signOut() async {
+    _writeLog("Log out");
     await supabase.auth.signOut();
   }
 
@@ -136,6 +154,7 @@ class SupaBase {
 
   //aggiorna l'username dell'utente
   Future<UserResponse> updateUsername(String username) {
+    _writeLog("Modifica username");
     return supabase.auth.updateUser(UserAttributes(data: {'displayName': username}));
   }
 
