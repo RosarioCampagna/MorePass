@@ -231,7 +231,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 20),
 
                 //se non si è su iOS
-                if (defaultTargetPlatform != TargetPlatform.iOS)
+                if (defaultTargetPlatform != TargetPlatform.iOS || defaultTargetPlatform != TargetPlatform.windows)
                   //tasto per accedere a google
                   SizedBox(
                     width: 1000,
